@@ -39,6 +39,18 @@
             }
         }
     </style>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, getDoc, setDoc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Expose Firebase modules to window for global app usage
+        window.firebaseModules = {
+            initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged,
+            getFirestore, collection, doc, getDoc, setDoc, onSnapshot, getDocs
+        };
+    </script>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
@@ -52,9 +64,12 @@
                 <div>
                     <h1 class="text-lg sm:text-xl font-bold tracking-tight flex items-center gap-2">
                         e-Waris Pintar
-                        <span class="bg-amber-400 text-indigo-950 text-xs font-extrabold px-2 py-0.5 rounded-full uppercase">APDM / idMe Ready</span>
+                        <span class="bg-amber-400 text-indigo-950 text-xs font-extrabold px-2 py-0.5 rounded-full uppercase">Cloud Sync Ready</span>
                     </h1>
-                    <p class="text-xs text-indigo-200">Sistem Pengesanan Bilangan Anak & Semakan Keluarga Sekolah</p>
+                    <p class="text-xs text-indigo-200 flex items-center gap-1.5">
+                        <span id="cloud-status-dot" class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                        <span id="cloud-status-text">Menyambung ke Awan (Cloud Sync)...</span>
+                    </p>
                 </div>
             </div>
 
@@ -1762,7 +1777,83 @@ function janaLaporanWarisLebihSatuAnak() {
         }
 
         // Initialize application on window load
-        window.onload = function() {
+        window.onload = async function() {
+            await initFirebaseAndSync();
+        };
+
+        // ==========================================
+        // FIREBASE CLOUD SYNC & AUTHENTICATION
+        // ==========================================
+        let db, auth, currentUser = null;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'sekolah-ewaris-default-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+
+        async function initFirebaseAndSync() {
+            const statusText = document.getElementById('cloud-status-text');
+            const statusDot = document.getElementById('cloud-status-dot');
+
+            if (!firebaseConfig || !window.firebaseModules) {
+                // Fallback to localStorage if Firebase is not provided
+                console.warn('Firebase config not found, falling back to local storage.');
+                if (statusText) statusText.textContent = 'Mod Luar Talian (Local Storage)';
+                if (statusDot) statusDot.className = 'inline-block w-2 h-2 rounded-full bg-blue-400';
+                loadFromLocalFallback();
+                return;
+            }
+
+            try {
+                const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, getFirestore, collection, doc, onSnapshot } = window.firebaseModules;
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // Authentication
+                const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : undefined;
+                if (initialToken) {
+                    await signInWithCustomToken(auth, initialToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                currentUser = auth.currentUser;
+                if (statusText) statusText.textContent = 'Cloud Sync Aktif (Multi-Peranti)';
+                if (statusDot) statusDot.className = 'inline-block w-2 h-2 rounded-full bg-emerald-400';
+
+                // Real-time listener for public cloud data (shared across all users of this app)
+                const dataDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'school_records');
+                
+                onSnapshot(dataDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const cloudData = docSnap.data();
+                        if (cloudData.students && Array.isArray(cloudData.students)) {
+                            students = cloudData.students;
+                        }
+                        if (cloudData.paidFamiliesMap) {
+                            paidFamiliesMap = cloudData.paidFamiliesMap;
+                        }
+                        processFamilies();
+                        console.log('Data synced from cloud successfully.');
+                    } else {
+                        // Initialize cloud with sample data if empty
+                        loadSampleData(false);
+                        saveToCloud();
+                    }
+                }, (error) => {
+                    console.error('Firestore snapshot error:', error);
+                    if (statusText) statusText.textContent = 'Ralat Cloud Sync - Menggunakan Data Tempatan';
+                    if (statusDot) statusDot.className = 'inline-block w-2 h-2 rounded-full bg-rose-400';
+                    loadFromLocalFallback();
+                });
+
+            } catch (err) {
+                console.error('Firebase initialization error:', err);
+                if (statusText) statusText.textContent = 'Mod Luar Talian (Local Storage)';
+                if (statusDot) statusDot.className = 'inline-block w-2 h-2 rounded-full bg-blue-400';
+                loadFromLocalFallback();
+            }
+        }
+
+        function loadFromLocalFallback() {
             try {
                 const savedStudents = localStorage.getItem('ewaris_students_data');
                 const savedPaid = localStorage.getItem('ewaris_paid_families');
@@ -1784,12 +1875,37 @@ function janaLaporanWarisLebihSatuAnak() {
                     setupAutoSyncTimer();
                 }
             } catch (e) {
-                console.error('Error loading storage, using sample data:', e);
                 loadSampleData(false);
             }
-
             processFamilies();
-        };
+        }
+
+        async function saveToStorage() {
+            // Save locally as backup
+            try {
+                localStorage.setItem('ewaris_students_data', JSON.stringify(students));
+                localStorage.setItem('ewaris_paid_families', JSON.stringify(paidFamiliesMap));
+            } catch (e) {}
+
+            // Save to Cloud Firestore if connected
+            await saveToCloud();
+        }
+
+        async function saveToCloud() {
+            if (!db || !auth || !auth.currentUser) return;
+            try {
+                const { doc, setDoc } = window.firebaseModules;
+                const dataDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'school_records');
+                await setDoc(dataDocRef, {
+                    students: students,
+                    paidFamiliesMap: paidFamiliesMap,
+                    updatedAt: new Date().toISOString(),
+                    updatedBy: auth.currentUser.uid
+                }, { merge: true });
+            } catch (e) {
+                console.error('Error saving to cloud:', e);
+            }
+        }
     </script>
 </body>
 </html>
