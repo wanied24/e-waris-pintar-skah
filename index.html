@@ -334,45 +334,62 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         let app, db, auth;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'sekolah-ewaris-app-2026';
 
         window.isCloudSynced = false;
 
-        try {
-            if (typeof __firebase_config !== 'undefined') {
-                const firebaseConfig = JSON.parse(__firebase_config);
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
+        async function initFirebase() {
+            try {
+                if (typeof __firebase_config !== 'undefined') {
+                    const firebaseConfig = JSON.parse(__firebase_config);
+                    app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
 
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                window.firebaseDb = db;
-                window.firebaseDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'ewaris_state');
-                window.isCloudSynced = true;
-
-                // Real-time listener for multi-device sync
-                onSnapshot(window.firebaseDocRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        if (data.students && Array.isArray(data.students)) {
-                            window.applyCloudData(data.students, data.paidFamiliesMap || {}, data.paidStudentsMap || {});
-                        }
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
                     }
-                }, (error) => {
-                    console.warn('Firestore snapshot notice:', error);
-                });
+
+                    window.firebaseDb = db;
+                    window.firebaseDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'ewaris_state');
+                    window.isCloudSynced = true;
+
+                    // Fetch initial cloud data immediately
+                    try {
+                        const docSnap = await getDoc(window.firebaseDocRef);
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            if (data.students && Array.isArray(data.students)) {
+                                window.applyCloudData(data.students, data.paidFamiliesMap || {}, data.paidStudentsMap || {});
+                            }
+                        }
+                    } catch (err) {
+                        console.warn('Initial cloud fetch notice:', err);
+                    }
+
+                    // Real-time listener for instant multi-device sync
+                    onSnapshot(window.firebaseDocRef, (docSnap) => {
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            if (data.students && Array.isArray(data.students)) {
+                                window.applyCloudData(data.students, data.paidFamiliesMap || {}, data.paidStudentsMap || {});
+                            }
+                        }
+                    }, (error) => {
+                        console.warn('Firestore snapshot notice:', error);
+                    });
+                }
+            } catch (e) {
+                console.warn('Firebase cloud sync fallback to local mode:', e);
             }
-        } catch (e) {
-            console.warn('Firebase cloud sync fallback to local mode:', e);
         }
+
+        initFirebase();
     </script>
 
     <script>
@@ -1067,7 +1084,9 @@
                         paidFamiliesMap: paidFamiliesMap,
                         paidStudentsMap: paidStudentsMap,
                         updatedAt: new Date().toISOString()
-                    }, { merge: true }).catch(err => {
+                    }, { merge: true }).then(() => {
+                        console.log('Cloud synced successfully');
+                    }).catch(err => {
                         console.warn('Cloud sync save notice:', err);
                     });
                 }
