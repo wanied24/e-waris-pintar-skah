@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pengesanan Waris & Adik-Beradik Sekolah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background-color: white;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-indigo-900 text-white shadow-lg sticky top-0 z-30 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-700 p-1 rounded-xl shadow-inner flex items-center justify-center overflow-hidden w-12 h-12">
+                    <img src="https://imgur.com/yMnAAhU.png" alt="Logo Sekolah" class="w-full h-full object-cover scale-125" onerror="this.onerror=null; this.src='https://placehold.co/48x48/4f46e5/ffffff?text=Logo';">
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold tracking-tight flex items-center gap-2">
+                        e-Waris Pintar
+                        <span class="bg-amber-400 text-indigo-950 text-xs font-extrabold px-2 py-0.5 rounded-full uppercase">APDM / idMe Ready</span>
+                    </h1>
+                    <p class="text-xs text-indigo-200">Sistem Pengesanan Bilangan Anak & Semakan Keluarga Sekolah</p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+                <button onclick="openSheetSyncModal()" id="nav-sync-btn" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-emerald-500 hover:bg-emerald-600 text-slate-950 shadow-sm transition flex items-center gap-1.5">
+                    <i id="sync-icon" class="ph-bold ph-arrows-clockwise text-lg"></i>
+                    <span id="sync-status-label">Sambung Google Sheets (Live)</span>
+                </button>
+                <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="px-3.5 py-2 rounded-xl text-sm font-medium bg-indigo-700 text-white shadow-sm transition flex items-center gap-1.5">
+                    <i class="ph ph-magnifying-glass text-lg"></i> Semakan & Senarai
+                </button>
+                <button onclick="switchTab('students')" id="tab-btn-students" class="px-3.5 py-2 rounded-xl text-sm font-medium text-indigo-100 hover:bg-indigo-800 transition flex items-center gap-1.5">
+                    <i class="ph ph-student text-lg"></i> Data Murid (<span id="nav-student-count">0</span>)
+                </button>
+                <button onclick="switchTab('guide')" id="tab-btn-guide" class="px-3.5 py-2 rounded-xl text-sm font-medium text-indigo-100 hover:bg-indigo-800 transition flex items-center gap-1.5">
+                    <i class="ph ph-code text-lg"></i> Kod Google Sheets / Apps Script
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 hidden transform transition-all duration-300 no-print">
+        <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 border border-slate-700">
+            <i id="toast-icon" class="ph-fill ph-check-circle text-emerald-400 text-xl"></i>
+            <span id="toast-message" class="text-sm font-medium">Berjaya!</span>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- Statistics Banner -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 no-print">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center gap-4">
+                <div class="bg-blue-50 text-blue-600 p-3.5 rounded-xl">
+                    <i class="ph-fill ph-student text-3xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Jumlah Murid</p>
+                    <h2 id="stat-total-students" class="text-2xl font-bold text-slate-800">0</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Rekod aktif dalam sistem</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center gap-4">
+                <div class="bg-indigo-50 text-indigo-600 p-3.5 rounded-xl">
+                    <i class="ph-fill ph-house-line text-3xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Jumlah Keluarga / Waris</p>
+                    <h2 id="stat-total-families" class="text-2xl font-bold text-slate-800">0</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">1 Keluarga = 1 Wakil PIBG</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-emerald-200 flex items-center gap-4 relative overflow-hidden">
+                <div class="bg-emerald-50 text-emerald-600 p-3.5 rounded-xl">
+                    <i class="ph-fill ph-users-three text-3xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Waris > 1 Anak</p>
+                    <div class="flex items-baseline gap-2">
+                        <h2 id="stat-multi-families" class="text-2xl font-bold text-emerald-600">0</h2>
+                        <span id="stat-multi-percentage" class="text-xs font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">0%</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5">Mempunyai adik-beradik di sekolah</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-amber-200 flex items-center gap-4">
+                <div class="bg-amber-50 text-amber-600 p-3.5 rounded-xl">
+                    <i class="ph-fill ph-wallet text-3xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-amber-700 uppercase tracking-wider">Kutipan PIBG Keluarga</p>
+                    <div class="flex items-baseline gap-2">
+                        <h2 id="stat-pibg-paid" class="text-2xl font-bold text-amber-600">0 / 0</h2>
+                        <span id="stat-multi-students" class="text-xs font-semibold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">0 Beradik</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5">Keluarga selesai bayar (1 Wakil)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Amaran Semakan Kualiti Data KP -->
+        <div id="data-quality-banner" class="hidden mb-6 bg-rose-50 border border-rose-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 no-print">
+            <div class="flex items-center gap-3">
+                <div class="bg-rose-100 text-rose-600 p-2.5 rounded-xl shrink-0">
+                    <i class="ph-fill ph-warning-octagon text-2xl"></i>
+                </div>
+                <div>
+                    <h4 class="text-xs font-extrabold uppercase text-rose-800">Pengesan Ralat Data APDM / idMe</h4>
+                    <p id="data-quality-text" class="text-xs text-rose-700 mt-0.5">Terdapat rekod waris dengan No. KP tidak lengkap (kurang 12 digit).</p>
+                </div>
+            </div>
+            <button onclick="switchTab('students')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shrink-0 transition">
+                Semak & Baiki
+            </button>
+        </div>
+
+        <!-- TAB 1: DASHBOARD & CARIAN WARIS -->
+        <section id="tab-dashboard" class="space-y-6">
+            
+            <!-- Action & Quick Upload Bar -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 no-print">
+                <div class="flex-grow">
+                    <label for="search-input" class="block text-xs font-semibold text-slate-500 uppercase mb-1.5">
+                        Semakan Pantas (No. KP Waris / Nama Waris / Nama Murid / Kelas)
+                    </label>
+                    <div class="relative">
+                        <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+                        <input type="text" id="search-input" oninput="renderDashboard()" placeholder="Contoh: 820512025431 atau Ahmad atau 4 Bestari..." 
+                            class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                        <button onclick="clearSearch()" id="clear-search-btn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                            <i class="ph-fill ph-x-circle text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filter Status -->
+                <div class="sm:w-52">
+                    <label for="filter-type" class="block text-xs font-semibold text-slate-500 uppercase mb-1.5">
+                        Tapisan Status Anak
+                    </label>
+                    <select id="filter-type" onchange="renderDashboard()" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option value="all">Semua Keluarga / Waris</option>
+                        <option value="multi" selected>Waris Lebih > 1 Anak Sahaja</option>
+                        <option value="single">Waris 1 Anak Sahaja</option>
+                        <option value="3plus">Waris 3 Anak & Ke Atas</option>
+                        <option value="unpaid">Belum Bayar PIBG</option>
+                        <option value="paid">Selesai Bayar PIBG</option>
+                    </select>
+                </div>
+
+                <!-- Filter Kelas -->
+                <div class="sm:w-44">
+                    <label for="filter-class" class="block text-xs font-semibold text-slate-500 uppercase mb-1.5">
+                        Ikut Kelas (Guru Kelas)
+                    </label>
+                    <select id="filter-class" onchange="renderDashboard()" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option value="all">Semua Kelas</option>
+                    </select>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap items-center gap-2 lg:pt-5">
+                    <button onclick="openSheetSyncModal()" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
+                        <i class="ph-bold ph-google-logo"></i> Live Google Sheets
+                    </button>
+                    <button onclick="openAddModal()" class="px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center gap-1.5">
+                        <i class="ph-bold ph-plus"></i> Tambah
+                    </button>
+                    <button onclick="openPasteModal()" class="px-3.5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-sm font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
+                        <i class="ph-bold ph-clipboard-text"></i> Copy-Paste
+                    </button>
+                    <button onclick="exportFamilyCSV()" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center gap-1.5" title="Muat turun laporan keluarga dalam format CSV">
+                        <i class="ph-bold ph-download-simple"></i> Eksport
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bar Status Live Sync Google Sheets (Muncul apabila disambungkan) -->
+            <div id="live-sync-banner" class="hidden bg-emerald-900 text-white px-5 py-3 rounded-2xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 no-print">
+                <div class="flex items-center gap-3">
+                    <span class="relative flex h-3 w-3 shrink-0">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
+                    </span>
+                    <div>
+                        <p class="text-xs font-extrabold uppercase tracking-wider text-emerald-300">Auto-Sync Google Sheets Aktif</p>
+                        <p id="live-sync-timestamp" class="text-xs text-emerald-100">Kemaskini terakhir: Sebentar tadi • Sistem menyemak perubahan Google Sheets secara automatik.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <button onclick="syncFromGoogleSheet(true)" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition flex items-center gap-1">
+                        <i class="ph-bold ph-arrows-clockwise"></i> Tarik Data Sekarang
+                    </button>
+                    <button onclick="openSheetSyncModal()" class="px-3 py-1.5 bg-emerald-950/60 hover:bg-emerald-950 text-emerald-200 text-xs font-semibold rounded-xl transition">
+                        Tetapan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Admin Data Input Guide Cards -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-4 no-print">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                        <i class="ph-fill ph-database text-indigo-600 text-base"></i>
+                        4 Cara Admin Memasukkan & Menyegerakkan Data Murid:
+                    </h3>
+                    <button onclick="loadSampleData(true)" class="text-xs font-semibold text-indigo-700 hover:text-indigo-900 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-200 transition">
+                        Muat Semula Data Contoh
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                    <div onclick="openSheetSyncModal()" class="cursor-pointer p-3 rounded-xl bg-emerald-50 border-2 border-emerald-400 hover:bg-emerald-100/70 transition flex items-start gap-3">
+                        <div class="bg-emerald-600 text-white font-extrabold w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
+                            <i class="ph-bold ph-lightning"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-emerald-950">Auto-Sync Google Sheets (Disyorkan)</p>
+                            <p class="text-slate-600 mt-0.5">Admin edit di Google Sheets, sistem kemaskini secara automatik setiap 30 saat!</p>
+                        </div>
+                    </div>
+                    <div onclick="openPasteModal()" class="cursor-pointer p-3 rounded-xl bg-amber-50/70 border border-amber-200 hover:bg-amber-100/70 transition flex items-start gap-3">
+                        <div class="bg-amber-400 text-slate-950 font-extrabold w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5">2</div>
+                        <div>
+                            <p class="font-bold text-slate-900">Copy & Paste Dari Excel</p>
+                            <p class="text-slate-600 mt-0.5">Highlight baris dalam Excel/Sheets, tekan Ctrl+C dan tampal terus.</p>
+                        </div>
+                    </div>
+                    <div onclick="openUploadModal()" class="cursor-pointer p-3 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 transition flex items-start gap-3">
+                        <div class="bg-slate-700 text-white font-extrabold w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5">3</div>
+                        <div>
+                            <p class="font-bold text-slate-900">Import Fail CSV (APDM)</p>
+                            <p class="text-slate-600 mt-0.5">Muat naik fail .csv daripada komputer untuk ratusan murid serentak.</p>
+                        </div>
+                    </div>
+                    <div onclick="openAddModal()" class="cursor-pointer p-3 rounded-xl bg-indigo-50/70 border border-indigo-200 hover:bg-indigo-100/70 transition flex items-start gap-3">
+                        <div class="bg-indigo-600 text-white font-extrabold w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5">4</div>
+                        <div>
+                            <p class="font-bold text-slate-900">Borang Manual Satu-Satu</p>
+                            <p class="text-slate-600 mt-0.5">Sesuai apabila ada murid baharu berpindah masuk.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results List Header -->
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    Hasil Pengesanan Keluarga
+                    <span id="result-badge-count" class="bg-slate-200 text-slate-700 text-xs px-2.5 py-0.5 rounded-full font-semibold">0 keluarga ditemui</span>
+                </h3>
+                <button onclick="window.print()" type="button" class="no-print text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm cursor-pointer">
+                    <i class="ph ph-printer text-base"></i> Cetak Senarai
+                </button>
+            </div>
+
+            <!-- Family Cards Grid -->
+            <div id="family-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Populated by JS -->
+            </div>
+
+        </section>
+
+        <!-- TAB 2: SENARAI DATA MURID PENUH -->
+        <section id="tab-students" class="hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Pangkalan Data Semua Murid</h3>
+                        <p class="text-xs text-slate-500">Status bilangan adik-beradik dikira secara automatik berdasarkan padanan No. KP Bapa/Ibu.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="student-table-search" oninput="renderStudentTable()" placeholder="Cari murid atau kelas..." class="px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button onclick="clearAllData()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold rounded-xl border border-rose-200 transition">
+                            Kosongkan Semua
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-600 text-xs uppercase font-bold border-b border-slate-200">
+                                <th class="py-3 px-4">Bil</th>
+                                <th class="py-3 px-4">Nama Murid & MyKid</th>
+                                <th class="py-3 px-4">Kelas</th>
+                                <th class="py-3 px-4">Waris 1 (Bapa/Penjaga)</th>
+                                <th class="py-3 px-4">Waris 2 (Ibu)</th>
+                                <th class="py-3 px-4 text-center">Status Keluarga</th>
+                                <th class="py-3 px-4 text-center">Wakil Bayaran PIBG</th>
+                                <th class="py-3 px-4 text-right">Tindakan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-table-body" class="divide-y divide-slate-200 text-sm">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: PANDUAN GOOGLE SHEETS & APPS SCRIPT -->
+        <section id="tab-guide" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+                <div class="border-b border-slate-200 pb-4">
+                    <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-1 rounded-full uppercase">Panduan Teknikal Sekolah</span>
+                    <h2 class="text-xl font-bold text-slate-800 mt-2">Cara Bina Dalam Google Sheets / Excel & Google Apps Script</h2>
+                    <p class="text-sm text-slate-600 mt-1">Selain menggunakan aplikasi web ini secara terus, anda juga boleh menyalin formula atau skrip di bawah terus ke dalam fail Google Sheets sekolah anda.</p>
+                </div>
+
+                <!-- Kaedah 1: Formula Google Sheets -->
+                <div class="space-y-3">
+                    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <span class="bg-emerald-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center text-xs">1</span>
+                        Kaedah Paling Mudah: Formula Terus Dalam Google Sheets / Excel
+                    </h3>
+                    <p class="text-sm text-slate-600">Andaikan struktur Google Sheet anda mempunyai lajur berikut: <strong>Lajur A (Nama Murid)</strong>, <strong>Lajur B (Kelas)</strong>, <strong>Lajur C (Nama Waris)</strong>, dan <strong>Lajur D (No. KP Waris)</strong>.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-slate-900 text-slate-100 p-4 rounded-xl relative">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-semibold text-amber-400 uppercase">Formula Lajur E: Kira Bilangan Anak</span>
+                                <button onclick="copyCode('formula-1')" class="text-xs bg-slate-700 hover:bg-slate-600 px-2.5 py-1 rounded-lg text-white">Salin</button>
+                            </div>
+                            <code id="formula-1" class="text-xs sm:text-sm font-mono text-emerald-300 block break-all">=COUNTIF(D:D, D2)</code>
+                            <p class="text-xs text-slate-400 mt-2">Mengira berapa kali No. KP Waris pada sel D2 berulang dalam keseluruhan Lajur D.</p>
+                        </div>
+
+                        <div class="bg-slate-900 text-slate-100 p-4 rounded-xl relative">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-semibold text-amber-400 uppercase">Formula Lajur F: Status Lebih 1 Anak</span>
+                                <button onclick="copyCode('formula-2')" class="text-xs bg-slate-700 hover:bg-slate-600 px-2.5 py-1 rounded-lg text-white">Salin</button>
+                            </div>
+                            <code id="formula-2" class="text-xs sm:text-sm font-mono text-emerald-300 block break-all">=IF(COUNTIF(D:D, D2)>1, "Lebih 1 Anak ("&COUNTIF(D:D, D2)&" Orang)", "Anak Tunggal Di Sekolah")</code>
+                            <p class="text-xs text-slate-400 mt-2">Memaparkan label secara automatik sama ada waris mempunyai lebih dari seorang anak.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-bold text-amber-900 uppercase">Formula Tambahan: Menentukan Wakil Kutipan PIBG (1 Keluarga = 1 Bayaran)</span>
+                            <button onclick="copyCode('formula-3')" class="text-xs bg-amber-200 hover:bg-amber-300 px-2.5 py-1 rounded-lg text-amber-900 font-semibold">Salin</button>
+                        </div>
+                        <code id="formula-3" class="text-xs sm:text-sm font-mono text-amber-950 font-semibold block break-all my-1">=IF(COUNTIF($D$2:D2, D2)=1, "WAKIL KELUARGA (BAYAR)", "DIKECUALIKAN (ADIK-BERADIK)")</code>
+                        <p class="text-xs text-amber-800">Formula ini memastikan hanya anak pertama dalam senarai ditandakan sebagai <strong>WAKIL KELUARGA</strong> manakala adik-beradik lain yang berkongsi No. KP Waris yang sama ditandakan sebagai dikecualikan!</p>
+                    </div>
+                </div>
+
+                <!-- Kaedah 2: Google Apps Script -->
+                <div class="space-y-3 pt-4 border-t border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                            <span class="bg-indigo-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center text-xs">2</span>
+                            Skrip Automasi Google Sheets (Google Apps Script)
+                        </h3>
+                        <button onclick="copyCode('gas-code')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg flex items-center gap-1">
+                            <i class="ph ph-copy"></i> Salin Kod Apps Script
+                        </button>
+                    </div>
+                    <p class="text-sm text-slate-600">Buka Google Sheets anda, klik <strong>Extensions &gt; Apps Script</strong>, tampal kod di bawah untuk menjana jadual ringkasan keluarga secara automatik (termasuk padanan silang No. KP Bapa dan Ibu):</p>
+                    
+                    <pre id="gas-code" class="bg-slate-900 text-slate-100 p-4 rounded-xl text-xs font-mono overflow-x-auto custom-scrollbar leading-relaxed">/**
+ * Fungsi Google Apps Script untuk mengenalpasti waris yang mempunyai
+ * lebih daripada seorang anak di sekolah (Menyokong Padanan KP Bapa & Ibu)
+ */
+function janaLaporanWarisLebihSatuAnak() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheetMurid = ss.getSheetByName('Data_Murid'); // Pastikan nama sheet betul
+  
+  if (!sheetMurid) {
+    SpreadsheetApp.getUi().alert('Sila pastikan terdapat sheet bernama "Data_Murid"!');
+    return;
+  }
+
+  const data = sheetMurid.getDataRange().getValues();
+  const petaKeluarga = {};
+
+  // Andaian Lajur: [0]Nama Murid, [1]MyKid, [2]Kelas, [3]Nama Bapa/Waris1, [4]KP Bapa/Waris1, [5]Nama Ibu/Waris2, [6]KP Ibu/Waris2, [7]No Telefon
+  for (let i = 1; i &lt; data.length; i++) {
+    let namaMurid = data[i][0];
+    let mykid     = String(data[i][1]).replace(/[-\s]/g, '');
+    let kelas     = data[i][2];
+    let namaWaris = data[i][3] || data[i][5];
+    let kpBapa    = String(data[i][4] || '').replace(/[-\s]/g, '');
+    let kpIbu     = String(data[i][6] || '').replace(/[-\s]/g, '');
+    let noTel     = String(data[i][7] || '');
+
+    if (!namaMurid) continue;
+
+    // Gunakan KP Bapa sebagai kunci utama, jika tiada guna KP Ibu
+    let kunciKeluarga = kpBapa !== '' ? kpBapa : kpIbu;
+    if (!kunciKeluarga) continue;
+
+    if (!petaKeluarga[kunciKeluarga]) {
+      petaKeluarga[kunciKeluarga] = {
+        namaWaris: namaWaris,
+        kpWaris: kunciKeluarga,
+        noTel: noTel,
+        anak: []
+      };
+    }
+    petaKeluarga[kunciKeluarga].anak.push(namaMurid + ' (' + kelas + ')');
+  }
+
+  // Cipta atau kemaskini Sheet Laporan
+  let sheetLaporan = ss.getSheetByName('Laporan_Waris');
+  if (!sheetLaporan) {
+    sheetLaporan = ss.insertSheet('Laporan_Waris');
+  } else {
+    sheetLaporan.clear();
+  }
+
+  // Bina Header
+  sheetLaporan.appendRow([
+    'No. KP Waris', 'Nama Waris', 'No. Telefon', 
+    'Bilangan Anak', 'Status', 'Senarai Anak & Kelas'
+  ]);
+
+  // Masukkan Data
+  Object.values(petaKeluarga).forEach(kel => {
+    let bil = kel.anak.length;
+    let status = bil > 1 ? 'LEBIH 1 ANAK (' + bil + ' ORANG)' : '1 ANAK SAHAJA';
+    sheetLaporan.appendRow([
+      "'" + kel.kpWaris,
+      kel.namaWaris,
+      "'" + kel.noTel,
+      bil,
+      status,
+      kel.anak.join(', ')
+    ]);
+  });
+}</pre>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    <!-- MODAL TAMBAH / EDIT MURID -->
+    <div id="add-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="bg-indigo-900 text-white px-6 py-4 flex items-center justify-between">
+                <h3 id="modal-student-title" class="font-bold text-base flex items-center gap-2">
+                    <i class="ph-fill ph-user-plus text-amber-400 text-xl"></i>
+                    Tambah Rekod Murid & Waris
+                </h3>
+                <button onclick="closeAddModal()" class="text-indigo-200 hover:text-white">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+            <form id="add-student-form" onsubmit="handleAddStudent(event)" class="p-6 space-y-4">
+                <input type="hidden" id="inp-edit-id" value="">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Penuh Murid *</label>
+                        <input type="text" id="inp-nama" required placeholder="Contoh: MUHAMMAD DANISH BIN AHMAD" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">No. MyKid / KP Murid *</label>
+                        <input type="text" id="inp-mykid" required placeholder="140312021123" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Kelas / Tingkatan *</label>
+                        <input type="text" id="inp-kelas" required placeholder="Contoh: 6 BESTARI" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-200 pt-3">
+                    <p class="text-xs font-bold text-indigo-700 uppercase mb-3">Maklumat Penjaga 1 (Bapa / Waris Utama)</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Bapa / Penjaga 1 *</label>
+                            <input type="text" id="inp-bapa-nama" required placeholder="AHMAD BIN HASSAN" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">No. KP Bapa / Penjaga 1 *</label>
+                            <input type="text" id="inp-bapa-kp" required placeholder="820512025431" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-200 pt-3">
+                    <p class="text-xs font-bold text-indigo-700 uppercase mb-3">Maklumat Penjaga 2 (Ibu / Pasangan - Pilihan)</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Ibu / Penjaga 2</label>
+                            <input type="text" id="inp-ibu-nama" placeholder="SITI AMINAH BINTI ALI" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">No. KP Ibu / Penjaga 2</label>
+                            <input type="text" id="inp-ibu-kp" placeholder="840819026122" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">No. Telefon Waris</label>
+                    <input type="text" id="inp-tel" placeholder="012-4567890" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeAddModal()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl">Batal</button>
+                    <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-sm">Simpan & Semak Waris</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL COPY & PASTE EXCEL / GOOGLE SHEETS -->
+    <div id="paste-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="bg-amber-500 text-slate-950 px-6 py-4 flex items-center justify-between">
+                <h3 class="font-extrabold text-base flex items-center gap-2">
+                    <i class="ph-fill ph-clipboard-text text-xl"></i>
+                    Tampal (Copy & Paste) Terus Dari Excel / Google Sheets
+                </h3>
+                <button onclick="closePasteModal()" class="text-slate-800 hover:text-black">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="bg-amber-50 border border-amber-200 p-3.5 rounded-xl text-xs text-slate-700 space-y-1.5">
+                    <p class="font-bold text-slate-900">Cara Penggunaan (Tanpa Perlu Save Fail CSV):</p>
+                    <ol class="list-decimal list-inside space-y-1">
+                        <li>Buka fail Excel atau Google Sheets senarai murid sekolah anda.</li>
+                        <li>Susun 8 lajur mengikut turutan: <strong>Nama Murid | MyKid | Kelas | Nama Bapa | No KP Bapa | Nama Ibu | No KP Ibu | No Telefon</strong></li>
+                        <li><em>Highlight</em> baris data murid, tekan <strong>Ctrl + C (Copy)</strong>, dan tekan <strong>Ctrl + V (Paste)</strong> di dalam kotak di bawah:</li>
+                    </ol>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="text-xs font-bold text-slate-700 uppercase">Ruang Tampal Data Excel (Tab / Koma):</label>
+                        <button type="button" onclick="fillSamplePaste()" class="text-xs font-bold text-indigo-600 hover:underline">
+                            + Masukkan Contoh Data Tampal
+                        </button>
+                    </div>
+                    <textarea id="paste-textarea" rows="6" placeholder="Tampal (Ctrl+V) baris dari Excel di sini...&#10;Contoh:&#10;MUHAMMAD ADAM BIN ALI&#9;140511025111&#9;6 BESTARI&#9;ALI BIN ABU&#9;800101025555&#9;SARAH BINTI AHMAD&#9;820202026666&#9;012-3456789" class="w-full p-3.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono focus:ring-2 focus:ring-amber-500 outline-none custom-scrollbar"></textarea>
+                </div>
+
+                <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                    <label class="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer">
+                        <input type="checkbox" id="paste-replace-all" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                        Gantikan semua data sedia ada (Kosongkan data lama dahulu)
+                    </label>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="closePasteModal()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl">Batal</button>
+                        <button type="button" onclick="processPastedData()" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 text-sm font-extrabold rounded-xl shadow-sm flex items-center gap-1.5">
+                            <i class="ph-bold ph-check"></i> Proses & Masuk Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL IMPORT CSV -->
+    <div id="upload-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="bg-emerald-800 text-white px-6 py-4 flex items-center justify-between">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i class="ph-fill ph-file-csv text-emerald-300 text-xl"></i>
+                    Import Fail CSV (Data APDM / idMe)
+                </h3>
+                <button onclick="closeUploadModal()" class="text-emerald-200 hover:text-white">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <p class="text-xs sm:text-sm text-slate-600">
+                    Muat naik fail <code>.csv</code> yang dieksport daripada Excel atau Google Sheets. Susunan lajur yang disyorkan:
+                </p>
+                <div class="bg-slate-100 p-3 rounded-xl text-xs font-mono text-slate-700 border border-slate-200">
+                    Nama Murid, MyKid, Kelas, Nama Bapa/Waris1, No KP Bapa, Nama Ibu/Waris2, No KP Ibu, No Telefon
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-500">Perlukan fail contoh untuk dicuba?</span>
+                    <button onclick="downloadTemplateCSV()" class="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1">
+                        <i class="ph-bold ph-download-simple"></i> Muat Turun Templat CSV
+                    </button>
+                </div>
+
+                <div class="border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center hover:border-emerald-500 transition">
+                    <input type="file" id="csv-file-input" accept=".csv" class="hidden" onchange="handleCSVFile(event)">
+                    <label for="csv-file-input" class="cursor-pointer flex flex-col items-center">
+                        <i class="ph-duotone ph-cloud-arrow-up text-4xl text-emerald-600 mb-2"></i>
+                        <span class="text-sm font-bold text-slate-700">Klik untuk pilih fail CSV</span>
+                        <span class="text-xs text-slate-400 mt-1">Data diproses 100% di dalam pelayar anda (Privasi Terjamin)</span>
+                    </label>
+                </div>
+
+                <div class="flex justify-end">
+                    <button onclick="closeUploadModal()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SLIP PENGESAHAN KELUARGA & ADIK-BERADIK -->
+    <div id="slip-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between no-print">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i class="ph-fill ph-certificate text-amber-400 text-xl"></i>
+                    Slip Pengesahan Adik-Beradik & PIBG
+                </h3>
+                <button onclick="closeSlipModal()" type="button" class="text-slate-400 hover:text-white cursor-pointer">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+            <div id="slip-content" class="p-6 space-y-4 text-sm">
+                <!-- Populated by JS -->
+            </div>
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2 no-print">
+                <button onclick="closeSlipModal()" type="button" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer">Tutup</button>
+                <button onclick="printSlipContainer()" type="button" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl flex items-center gap-1.5 cursor-pointer">
+                    <i class="ph-bold ph-printer"></i> Cetak Slip
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SAMBUNGAN AUTOMATIK GOOGLE SHEETS (LIVE SYNC) -->
+    <div id="sheet-sync-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden max-h-[90vh] flex flex-col">
+            <div class="bg-emerald-800 text-white px-6 py-4 flex items-center justify-between shrink-0">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i class="ph-fill ph-arrows-clockwise text-emerald-300 text-xl"></i>
+                    Sambungan Automatik Google Sheets (Live Auto-Sync)
+                </h3>
+                <button onclick="closeSheetSyncModal()" class="text-emerald-200 hover:text-white">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4 overflow-y-auto custom-scrollbar text-sm">
+                <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-xs text-slate-700 space-y-2">
+                    <p class="font-extrabold text-emerald-950 text-sm flex items-center gap-1.5">
+                        <i class="ph-fill ph-check-circle text-emerald-600 text-lg"></i>
+                        Bagaimana Auto-Sync Ini Berfungsi?
+                    </p>
+                    <p>Apabila disambungkan, <strong>setiap kali Admin menambah atau mengemaskini nama murid/waris di dalam Google Sheets</strong>, sistem ini akan menarik data terkini secara automatik tanpa perlu muat naik fail berulang kali!</p>
+                </div>
+
+                <!-- Langkah Demi Langkah -->
+                <div class="space-y-2 text-xs">
+                    <p class="font-bold text-slate-800 uppercase">Langkah Mudah Di Google Sheets Anda:</p>
+                    <ol class="list-decimal list-inside space-y-1.5 text-slate-600 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <li>Buka Google Sheets sekolah anda dan pastikan 8 lajur pertama ialah:<br>
+                            <code class="text-[11px] bg-white px-2 py-0.5 rounded border border-slate-200 text-indigo-700 font-bold mt-1 inline-block">A: Nama Murid | B: MyKid | C: Kelas | D: Nama Bapa | E: KP Bapa | F: Nama Ibu | G: KP Ibu | H: No Telefon</code>
+                        </li>
+                        <li>Klik menu <strong>Share (Kongsi)</strong> di penjuru kanan atas Google Sheets &rarr; Tukar <em>General Access</em> kepada <strong>"Anyone with the link" (Viewer)</strong>, ATAU klik <strong>File &rarr; Share &rarr; Publish to web (CSV)</strong>.</li>
+                        <li>Salin pautan (Link URL) Google Sheets tersebut dan tampal di ruang bawah:</li>
+                    </ol>
+                </div>
+
+                <!-- Input URL Google Sheet -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Pautan (URL) Google Sheets atau Pautan CSV Published *</label>
+                    <input type="url" id="inp-sheet-url" placeholder="https://docs.google.com/spreadsheets/d/1abc123.../edit?usp=sharing" 
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm font-mono focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <p class="text-[11px] text-slate-500 mt-1">Anda boleh tampal link penuh Google Sheets biasa, sistem akan menukarkannya kepada pautan bacaan data secara automatik.</p>
+                </div>
+
+                <!-- Pilihan Kekerapan Auto-Sync -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Kekerapan Semakan Automatik</label>
+                        <select id="inp-sync-interval" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700">
+                            <option value="30">Setiap 30 Saat (Masa Nyata / Live)</option>
+                            <option value="60" selected>Setiap 1 Minit (Disyorkan)</option>
+                            <option value="300">Setiap 5 Minit</option>
+                            <option value="0">Semasa Buka Sistem & Manual Sahaja</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="button" onclick="disconnectGoogleSheet()" id="btn-disconnect-sheet" class="hidden w-full py-2 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition">
+                            Putuskan Sambungan Google Sheets
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
+                <button type="button" onclick="downloadTemplateCSV()" class="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1">
+                    <i class="ph-bold ph-download-simple"></i> Muat Turun Templat Susunan Lajur
+                </button>
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeSheetSyncModal()" class="px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl">Tutup</button>
+                    <button type="button" onclick="saveAndConnectGoogleSheet()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm flex items-center gap-1.5">
+                        <i class="ph-bold ph-plugs-connected"></i> Simpan & Tarik Data Sekarang
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // GLOBAL FUNCTIONS & NAVIGATION
+        // ==========================================
+        
+        // Data Contoh Realistik Sekolah Malaysia
+        const initialSampleData = [
+            {
+                id: 'M01',
+                nama: 'MUHAMMAD DANISH HAIKAL BIN AHMAD FAIZAL',
+                mykid: '140312025119',
+                kelas: '6 BESTARI',
+                namaBapa: 'AHMAD FAIZAL BIN HASSAN',
+                kpBapa: '820512025431',
+                namaIbu: 'NORAINI BINTI KAMARUDIN',
+                kpIbu: '840819026122',
+                telefon: '012-4518890'
+            },
+            {
+                id: 'M02',
+                nama: 'NUR DAMIA QAISARA BINTI AHMAD FAIZAL',
+                mykid: '160722026314',
+                kelas: '4 CEMERLANG',
+                namaBapa: 'AHMAD FAIZAL BIN HASSAN',
+                kpBapa: '820512025431',
+                namaIbu: 'NORAINI BINTI KAMARUDIN',
+                kpIbu: '840819026122',
+                telefon: '012-4518890'
+            },
+            {
+                id: 'M03',
+                nama: 'MUHAMMAD DARWISY RAYYAN BIN AHMAD FAIZAL',
+                mykid: '191104021887',
+                kelas: '1 BESTARI',
+                namaBapa: 'NORAINI BINTI KAMARUDIN',
+                kpBapa: '840819026122',
+                namaIbu: 'AHMAD FAIZAL BIN HASSAN',
+                kpIbu: '820512025431',
+                telefon: '019-4421102'
+            },
+            {
+                id: 'M04',
+                nama: 'PUTERI AUNI BATRISYIA BINTI MOHD RIZAL',
+                mykid: '150118024112',
+                kelas: '5 INTELEK',
+                namaBapa: 'MOHD RIZAL BIN ISMAIL',
+                kpBapa: '851120025991',
+                namaIbu: 'ROZITA BINTI CHE DIN',
+                kpIbu: '860304025118',
+                telefon: '013-4892210'
+            },
+            {
+                id: 'M05',
+                nama: 'PUTERA AIMAN HAZIQ BIN MOHD RIZAL',
+                mykid: '180909023311',
+                kelas: '2 GEMILANG',
+                namaBapa: 'MOHD RIZAL BIN ISMAIL',
+                kpBapa: '851120025991',
+                namaIbu: 'ROZITA BINTI CHE DIN',
+                kpIbu: '860304025118',
+                telefon: '013-4892210'
+            },
+            {
+                id: 'M06',
+                nama: 'SYED ALIFF FIRDAUS BIN SYED AZMAN',
+                mykid: '140505021921',
+                kelas: '6 CEMERLANG',
+                namaBapa: 'SYED AZMAN BIN SYED OMAR',
+                kpBapa: '790414025219',
+                namaIbu: 'SHARIFAH ZAINAB BINTI SYED ALI',
+                kpIbu: '810212026044',
+                telefon: '017-4019922'
+            },
+            {
+                id: 'M07',
+                nama: 'SYARIFAH ALYA MAISARAH BINTI SYED AZMAN',
+                mykid: '160811023442',
+                kelas: '4 BESTARI',
+                namaBapa: 'SYED AZMAN BIN SYED OMAR',
+                kpBapa: '790414025219',
+                namaIbu: 'SHARIFAH ZAINAB BINTI SYED ALI',
+                kpIbu: '810212026044',
+                telefon: '017-4019922'
+            },
+            {
+                id: 'M08',
+                nama: 'SYED AMMAR ZAKWAN BIN SYED AZMAN',
+                mykid: '171230025113',
+                kelas: '3 INTELEK',
+                namaBapa: 'SYED AZMAN BIN SYED OMAR',
+                kpBapa: '790414025219',
+                namaIbu: 'SHARIFAH ZAINAB BINTI SYED ALI',
+                kpIbu: '810212026044',
+                telefon: '017-4019922'
+            },
+            {
+                id: 'M09',
+                nama: 'SYARIFAH AMIRA SOFEA BINTI SYED AZMAN',
+                mykid: '190214026128',
+                kelas: '1 CEMERLANG',
+                namaBapa: 'SYED AZMAN BIN SYED OMAR',
+                kpBapa: '790414025219',
+                namaIbu: 'SHARIFAH ZAINAB BINTI SYED ALI',
+                kpIbu: '810212026044',
+                telefon: '017-4019922'
+            },
+            {
+                id: 'M10',
+                nama: 'CHONG WEI LIANG',
+                mykid: '150621023819',
+                kelas: '5 BESTARI',
+                namaBapa: 'CHONG KAH WAI',
+                kpBapa: '830910025771',
+                namaIbu: 'LIM MEI LING',
+                kpIbu: '850122026334',
+                telefon: '016-4112398'
+            },
+            {
+                id: 'M11',
+                nama: 'KAVINESH A/L SUBRAMANIAM',
+                mykid: '170419024911',
+                kelas: '3 BESTARI',
+                namaBapa: 'SUBRAMANIAM A/L RAMASAMY',
+                kpBapa: '811205025813',
+                namaIbu: 'KAVITHA A/P KRISHNAN',
+                kpIbu: '840715026190',
+                telefon: '012-5543120'
+            },
+            {
+                id: 'M12',
+                nama: 'NURUL IMANINA BINTI ZULKIFLI',
+                mykid: '140915021124',
+                kelas: '6 INTELEK',
+                namaBapa: 'ZULKIFLI BIN BAKAR',
+                kpBapa: '800101025119',
+                namaIbu: 'FARIDAH BINTI MANSOR',
+                kpIbu: '830618025440',
+                telefon: '011-23456789'
+            },
+            {
+                id: 'M13',
+                nama: 'MUHAMMAD HARRAZ BIN KHAIRUL ANUAR',
+                mykid: '180402023915',
+                kelas: '2 BESTARI',
+                namaBapa: 'KHAIRUL ANUAR BIN LATIFF',
+                kpBapa: '820707025337',
+                namaIbu: 'FARIDAH BINTI MANSOR',
+                kpIbu: '830618025440',
+                telefon: '011-23456789'
+            }
+        ];
+
+        let students = [];
+        let groupedFamilies = [];
+        let studentFamilyMap = {};
+        let paidFamiliesMap = {};
+        let googleSheetConfig = {
+            url: '',
+            intervalSec: 60,
+            lastSync: null
+        };
+        let syncTimerId = null;
+
+        function loadSampleData(notify = false) {
+            students = JSON.parse(JSON.stringify(initialSampleData));
+            saveToStorage();
+            processFamilies();
+            if (notify) showToast('Data contoh sekolah telah dimuatkan semula.');
+        }
+
+        function switchTab(tab) {
+            ['dashboard', 'students', 'guide'].forEach(t => {
+                const sec = document.getElementById(`tab-${t}`);
+                if (sec) sec.classList.add('hidden');
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (btn) {
+                    btn.className = 'px-3.5 py-2 rounded-xl text-sm font-medium text-indigo-100 hover:bg-indigo-800 transition flex items-center gap-1.5';
+                }
+            });
+            const activeSec = document.getElementById(`tab-${tab}`);
+            if (activeSec) activeSec.classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tab}`);
+            if (activeBtn) {
+                activeBtn.className = 'px-3.5 py-2 rounded-xl text-sm font-medium bg-indigo-700 text-white shadow-sm transition flex items-center gap-1.5';
+            }
+        }
+
+        function cleanIC(str) {
+            if (!str) return '';
+            return String(str).replace(/[-\s]/g, '').trim();
+        }
+
+        function formatIC(ic) {
+            const c = cleanIC(ic);
+            if (c.length === 12) {
+                return `${c.slice(0, 6)}-${c.slice(6, 8)}-${c.slice(8, 12)}`;
+            }
+            return c || '-';
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-message');
+            if (!toast || !msgEl) return;
+            msgEl.textContent = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3200);
+        }
+
+        function saveToStorage() {
+            try {
+                localStorage.setItem('ewaris_students_data', JSON.stringify(students));
+                localStorage.setItem('ewaris_paid_families', JSON.stringify(paidFamiliesMap));
+            } catch (e) {}
+        }
+
+        function processFamilies() {
+            const parentGraph = {};
+            students.forEach((s, idx) => {
+                const kp1 = cleanIC(s.kpBapa);
+                const kp2 = cleanIC(s.kpIbu);
+                if (kp1) {
+                    if (!parentGraph[kp1]) parentGraph[kp1] = [];
+                    parentGraph[kp1].push(idx);
+                }
+                if (kp2) {
+                    if (!parentGraph[kp2]) parentGraph[kp2] = [];
+                    parentGraph[kp2].push(idx);
+                }
+            });
+
+            const visited = new Array(students.length).fill(false);
+            groupedFamilies = [];
+            studentFamilyMap = {};
+
+            for (let i = 0; i < students.length; i++) {
+                if (visited[i]) continue;
+
+                const queue = [i];
+                visited[i] = true;
+                const memberIndices = [];
+
+                while (queue.length > 0) {
+                    const curr = queue.shift();
+                    memberIndices.push(curr);
+                    const s = students[curr];
+                    const kps = [cleanIC(s.kpBapa), cleanIC(s.kpIbu)].filter(Boolean);
+
+                    kps.forEach(kp => {
+                        const neighbors = parentGraph[kp] || [];
+                        neighbors.forEach(nIdx => {
+                            if (!visited[nIdx]) {
+                                visited[nIdx] = true;
+                                queue.push(nIdx);
+                            }
+                        });
+                    });
+                }
+
+                const memberList = memberIndices.map(idx => students[idx]);
+                const first = memberList[0];
+                const utamaKP = cleanIC(first.kpBapa) || cleanIC(first.kpIbu) || ('FAM_' + i);
+                const utamaNama = first.namaBapa || first.namaIbu || 'TIADA MAKLUMAT WARIS';
+                const pasanganNama = first.namaIbu || '';
+                const pasanganKP = cleanIC(first.kpIbu) || '';
+                const telefon = first.telefon || '-';
+
+                let crossMatchNote = '';
+                if (memberList.length > 1) {
+                    const bapaSet = new Set(memberList.map(m => cleanIC(m.kpBapa)).filter(Boolean));
+                    if (bapaSet.size > 1) {
+                        crossMatchNote = 'Dikesan melalui padanan silang No. KP Bapa & Ibu';
+                    }
+                }
+
+                const familyObj = {
+                    id: 'KEL_' + utamaKP,
+                    utamaKP,
+                    utamaNama,
+                    pasanganNama,
+                    pasanganKP,
+                    telefon,
+                    anak: memberList,
+                    jumlahAnak: memberList.length,
+                    lebihSatu: memberList.length > 1,
+                    crossMatchNote,
+                    isPaid: !!paidFamiliesMap[utamaKP]
+                };
+
+                groupedFamilies.push(familyObj);
+                memberList.forEach((m, idxInFam) => {
+                    studentFamilyMap[m.id] = {
+                        family: familyObj,
+                        isRepresentative: idxInFam === 0
+                    };
+                });
+            }
+
+            groupedFamilies.sort((a, b) => b.jumlahAnak - a.jumlahAnak);
+
+            populateClassFilter();
+            checkDataQuality();
+            updateStats();
+            renderDashboard();
+            renderStudentTable();
+        }
+
+        function populateClassFilter() {
+            const select = document.getElementById('filter-class');
+            if (!select) return;
+            const currentVal = select.value;
+            const classes = Array.from(new Set(students.map(s => (s.kelas || '').trim().toUpperCase()).filter(Boolean))).sort();
+            select.innerHTML = '<option value="all">Semua Kelas</option>' +
+                classes.map(c => `<option value="${c}">${c}</option>`).join('');
+            if (classes.includes(currentVal)) {
+                select.value = currentVal;
+            }
+        }
+
+        function checkDataQuality() {
+            const banner = document.getElementById('data-quality-banner');
+            const textEl = document.getElementById('data-quality-text');
+            if (!banner || !textEl) return;
+            const invalidCount = students.filter(s => {
+                const kp1 = cleanIC(s.kpBapa);
+                const kp2 = cleanIC(s.kpIbu);
+                return (!kp1 || kp1.length < 6) && (!kp2 || kp2.length < 6);
+            }).length;
+
+            if (invalidCount > 0) {
+                banner.classList.remove('hidden');
+                textEl.textContent = `Dikesan ${invalidCount} rekod murid yang tiada No. KP Waris yang lengkap. Sila kemaskini untuk ketepatan pengesanan adik-beradik.`;
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
+
+        function updateStats() {
+            const totalStudents = students.length;
+            const totalFamilies = groupedFamilies.length;
+            const multiFamilies = groupedFamilies.filter(f => f.lebihSatu).length;
+            const multiStudents = groupedFamilies.filter(f => f.lebihSatu).reduce((acc, f) => acc + f.jumlahAnak, 0);
+            const paidCount = groupedFamilies.filter(f => f.isPaid).length;
+            const percentage = totalFamilies > 0 ? Math.round((multiFamilies / totalFamilies) * 100) : 0;
+
+            const el1 = document.getElementById('stat-total-students');
+            const elNav = document.getElementById('nav-student-count');
+            const elFam = document.getElementById('stat-total-families');
+            const elMulti = document.getElementById('stat-multi-families');
+            const elPerc = document.getElementById('stat-multi-percentage');
+            const elPaid = document.getElementById('stat-pibg-paid');
+            const elMultiStu = document.getElementById('stat-multi-students');
+
+            if (el1) el1.textContent = totalStudents;
+            if (elNav) elNav.textContent = totalStudents;
+            if (elFam) elFam.textContent = totalFamilies;
+            if (elMulti) elMulti.textContent = multiFamilies;
+            if (elPerc) elPerc.textContent = `${percentage}%`;
+            if (elPaid) elPaid.textContent = `${paidCount} / ${totalFamilies}`;
+            if (elMultiStu) elMultiStu.textContent = `${multiStudents} Murid`;
+        }
+
+        function renderDashboard() {
+            const searchInput = document.getElementById('search-input');
+            const filterTypeEl = document.getElementById('filter-type');
+            const filterClassEl = document.getElementById('filter-class');
+            const clearBtn = document.getElementById('clear-search-btn');
+
+            const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
+            const cleanQuery = cleanIC(query);
+            const filterType = filterTypeEl ? filterTypeEl.value : 'all';
+            const filterClass = filterClassEl ? filterClassEl.value : 'all';
+
+            if (clearBtn) {
+                if (query.length > 0) clearBtn.classList.remove('hidden');
+                else clearBtn.classList.add('hidden');
+            }
+
+            const filtered = groupedFamilies.filter(f => {
+                if (filterType === 'multi' && !f.lebihSatu) return false;
+                if (filterType === 'single' && f.lebihSatu) return false;
+                if (filterType === '3plus' && f.jumlahAnak < 3) return false;
+                if (filterType === 'unpaid' && f.isPaid) return false;
+                if (filterType === 'paid' && !f.isPaid) return false;
+
+                if (filterClass !== 'all') {
+                    const hasClass = f.anak.some(a => (a.kelas || '').toUpperCase() === filterClass);
+                    if (!hasClass) return false;
+                }
+
+                if (!query) return true;
+
+                const matchWaris = f.utamaNama.toLowerCase().includes(query) ||
+                    f.pasanganNama.toLowerCase().includes(query) ||
+                    (cleanQuery && (f.utamaKP.includes(cleanQuery) || f.pasanganKP.includes(cleanQuery)));
+
+                const matchAnak = f.anak.some(a =>
+                    a.nama.toLowerCase().includes(query) ||
+                    a.kelas.toLowerCase().includes(query) ||
+                    (cleanQuery && cleanIC(a.mykid).includes(cleanQuery))
+                );
+
+                return matchWaris || matchAnak;
+            });
+
+            const badgeCount = document.getElementById('result-badge-count');
+            if (badgeCount) badgeCount.textContent = `${filtered.length} keluarga ditemui`;
+            const container = document.getElementById('family-cards-container');
+            if (!container) return;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full bg-white p-10 rounded-2xl border border-slate-200 text-center space-y-2">
+                        <i class="ph-duotone ph-magnifying-glass text-4xl text-slate-400"></i>
+                        <p class="text-base font-bold text-slate-700">Tiada Rekod Keluarga Ditemui</p>
+                        <p class="text-xs text-slate-500">Cuba tukar tapisan status atau kata kunci carian anda.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(f => {
+                const badgeColor = f.lebihSatu
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                    : 'bg-slate-100 text-slate-700 border-slate-200';
+                const statusLabel = f.lebihSatu
+                    ? `LEBIH 1 ANAK (${f.jumlahAnak} BERADIK)`
+                    : '1 ANAK DI SEKOLAH';
+
+                const pibgBtnClass = f.isPaid
+                    ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                    : 'bg-amber-100 text-amber-900 hover:bg-amber-200 border border-amber-300';
+
+                const anakRows = f.anak.map((a, idx) => `
+                    <div class="flex items-center justify-between py-2 px-3 rounded-xl ${idx === 0 ? 'bg-indigo-50/70 border border-indigo-100' : 'bg-slate-50 border border-slate-100'}">
+                        <div class="min-w-0 pr-2">
+                            <p class="text-xs font-bold text-slate-800 truncate">${idx + 1}. ${a.nama}</p>
+                            <p class="text-[11px] text-slate-500 font-mono">MyKid: ${formatIC(a.mykid)} • <span class="font-semibold text-indigo-700">${a.kelas}</span></p>
+                        </div>
+                        <span class="shrink-0 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase ${idx === 0 ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-700'}">
+                            ${idx === 0 ? 'Wakil PIBG' : 'Dikecualikan'}
+                        </span>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="bg-white rounded-2xl shadow-sm border ${f.lebihSatu ? 'border-emerald-200' : 'border-slate-200'} p-5 flex flex-col justify-between space-y-4">
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <span class="inline-block text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border ${badgeColor}">
+                                        ${statusLabel}
+                                    </span>
+                                    <h4 class="text-base font-bold text-slate-900 mt-1.5">${f.utamaNama}</h4>
+                                    <p class="text-xs text-slate-500 font-mono">No. KP Waris: <strong class="text-slate-700">${formatIC(f.utamaKP)}</strong> • Tel: ${f.telefon}</p>
+                                    ${f.pasanganNama ? `<p class="text-xs text-slate-500 mt-0.5">Pasangan: ${f.pasanganNama} (${formatIC(f.pasanganKP)})</p>` : ''}
+                                </div>
+                            </div>
+
+                            ${f.crossMatchNote ? `
+                                <div class="bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs text-amber-900">
+                                    <i class="ph-fill ph-sparkle text-amber-600"></i>
+                                    <span>${f.crossMatchNote}</span>
+                                </div>
+                            ` : ''}
+
+                            <div class="space-y-1.5 pt-1">
+                                <p class="text-[11px] font-bold uppercase text-slate-400">Senarai Anak Di Sekolah (${f.jumlahAnak} Orang):</p>
+                                ${anakRows}
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 no-print">
+                            <button onclick="togglePibgPaid('${f.utamaKP}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${pibgBtnClass}">
+                                <i class="ph-bold ${f.isPaid ? 'ph-check-circle' : 'ph-wallet'}"></i>
+                                ${f.isPaid ? 'PIBG Selesai Dibayar' : 'Tandakan Bayar PIBG'}
+                            </button>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="openWhatsAppWaris('${f.utamaKP}')" class="px-2.5 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-xl text-xs font-bold transition flex items-center gap-1">
+                                    <i class="ph-fill ph-whatsapp-logo text-sm"></i> WhatsApp
+                                </button>
+                                <button onclick="openSlipModal('${f.utamaKP}')" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1">
+                                    <i class="ph-bold ph-printer"></i> Slip Bukti
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderStudentTable() {
+            const tbody = document.getElementById('student-table-body');
+            if (!tbody) return;
+            const searchEl = document.getElementById('student-table-search');
+            const q = (searchEl ? searchEl.value : '').trim().toLowerCase();
+
+            const list = students.filter(s => {
+                if (!q) return true;
+                return s.nama.toLowerCase().includes(q) ||
+                    s.kelas.toLowerCase().includes(q) ||
+                    s.namaBapa.toLowerCase().includes(q) ||
+                    cleanIC(s.kpBapa).includes(q);
+            });
+
+            tbody.innerHTML = list.map((s, idx) => {
+                const mapInfo = studentFamilyMap[s.id];
+                const fam = mapInfo ? mapInfo.family : null;
+                const isRep = mapInfo ? mapInfo.isRepresentative : true;
+                const bil = fam ? fam.jumlahAnak : 1;
+
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-3 px-4 font-medium text-slate-500">${idx + 1}</td>
+                        <td class="py-3 px-4">
+                            <p class="font-bold text-slate-800">${s.nama}</p>
+                            <p class="text-xs text-slate-500 font-mono">${formatIC(s.mykid)}</p>
+                        </td>
+                        <td class="py-3 px-4 font-semibold text-indigo-700">${s.kelas}</td>
+                        <td class="py-3 px-4">
+                            <p class="font-medium text-slate-800">${s.namaBapa || '-'}</p>
+                            <p class="text-xs text-slate-500 font-mono">${formatIC(s.kpBapa)}</p>
+                        </td>
+                        <td class="py-3 px-4">
+                            <p class="font-medium text-slate-800">${s.namaIbu || '-'}</p>
+                            <p class="text-xs text-slate-500 font-mono">${formatIC(s.kpIbu)}</p>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${bil > 1 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}">
+                                ${bil > 1 ? `${bil} Beradik` : '1 Anak'}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${isRep ? 'bg-indigo-100 text-indigo-800' : 'bg-amber-50 text-amber-800'}">
+                                ${isRep ? 'WAKIL KELUARGA' : 'DIKECUALIKAN'}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-right space-x-1">
+                            <button onclick="editStudent('${s.id}')" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg" title="Edit">
+                                <i class="ph-bold ph-pencil-simple"></i>
+                            </button>
+                            <button onclick="deleteStudent('${s.id}')" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg" title="Padam">
+                                <i class="ph-bold ph-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function clearSearch() {
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) searchInput.value = '';
+            renderDashboard();
+        }
+
+        function togglePibgPaid(utamaKP) {
+            paidFamiliesMap[utamaKP] = !paidFamiliesMap[utamaKP];
+            saveToStorage();
+            processFamilies();
+            showToast(paidFamiliesMap[utamaKP] ? 'Ditandakan selesai bayar PIBG!' : 'Status bayaran PIBG dikemaskini.');
+        }
+
+        function openWhatsAppWaris(utamaKP) {
+            const fam = groupedFamilies.find(f => f.utamaKP === utamaKP);
+            if (!fam) return;
+            let phone = cleanIC(fam.telefon);
+            if (phone.startsWith('0')) phone = '6' + phone;
+            const senaraiAnak = fam.anak.map((a, i) => `${i + 1}. ${a.nama} (${a.kelas})`).join('%0A');
+            const statusPibg = fam.isPaid ? 'SELESAI DIBAYAR' : 'BELUM DIBAYAR (1 Wakil Keluarga Sahaja)';
+            const text = `Salam Sejahtera Tuan/Puan *${fam.utamaNama}*,%0A%0AMakluman Semakan Rekod Anak Di Sekolah:%0A${senaraiAnak}%0A%0AJumlah Anak: *${fam.jumlahAnak} Orang*%0AStatus Sumbangan PIBG: *${statusPibg}*%0A%0ATerima kasih.`;
+            window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+        }
+
+        function openSlipModal(utamaKP) {
+            const fam = groupedFamilies.find(f => f.utamaKP === utamaKP);
+            if (!fam) return;
+            const rows = fam.anak.map((a, i) => `
+                <tr class="border-b border-slate-200">
+                    <td class="py-2 px-3">${i + 1}</td>
+                    <td class="py-2 px-3 font-bold">${a.nama}</td>
+                    <td class="py-2 px-3">${a.kelas}</td>
+                    <td class="py-2 px-3 font-semibold">${i === 0 ? 'WAKIL BAYARAN PIBG' : 'DIKECUALIKAN (ADIK-BERADIK)'}</td>
+                </tr>
+            `).join('');
+
+            const slipContent = document.getElementById('slip-content');
+            if (slipContent) {
+                slipContent.innerHTML = `
+                    <div class="border-2 border-slate-800 p-5 rounded-xl space-y-4">
+                        <div class="text-center border-b border-slate-200 pb-3">
+                            <h4 class="font-extrabold text-base uppercase">SLIP PENGESAHAN ADIK-BERADIK & WAKIL KELUARGA</h4>
+                            <p class="text-xs text-slate-500">Cetakan Sistem e-Waris Pintar Sekolah</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div><span class="text-slate-500">Nama Waris:</span> <strong class="block text-slate-900">${fam.utamaNama}</strong></div>
+                            <div><span class="text-slate-500">No. KP Waris:</span> <strong class="block text-slate-900">${formatIC(fam.utamaKP)}</strong></div>
+                            <div><span class="text-slate-500">Bilangan Anak:</span> <strong class="block text-emerald-700">${fam.jumlahAnak} Orang Di Sekolah</strong></div>
+                            <div><span class="text-slate-500">Status PIBG:</span> <strong class="block">${fam.isPaid ? 'SELESAI BAYAR' : 'BELUM BAYAR'}</strong></div>
+                        </div>
+                        <table class="w-full text-left text-xs border border-slate-200">
+                            <thead class="bg-slate-100">
+                                <tr>
+                                    <th class="py-2 px-3">Bil</th>
+                                    <th class="py-2 px-3">Nama Murid</th>
+                                    <th class="py-2 px-3">Kelas</th>
+                                    <th class="py-2 px-3">Status Wakil</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                `;
+            }
+            const slipModal = document.getElementById('slip-modal');
+            if (slipModal) slipModal.classList.remove('hidden');
+        }
+
+        function closeSlipModal() {
+            const slipModal = document.getElementById('slip-modal');
+            if (slipModal) slipModal.classList.add('hidden');
+        }
+
+        function printSlipContainer() {
+            window.print();
+        }
+
+        function openAddModal() {
+            const editId = document.getElementById('inp-edit-id');
+            const form = document.getElementById('add-student-form');
+            const title = document.getElementById('modal-student-title');
+            const modal = document.getElementById('add-modal');
+            if (editId) editId.value = '';
+            if (form) form.reset();
+            if (title) title.innerHTML = '<i class="ph-fill ph-user-plus text-amber-400 text-xl"></i> Tambah Rekod Murid & Waris';
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeAddModal() {
+            const modal = document.getElementById('add-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function openPasteModal() {
+            const modal = document.getElementById('paste-modal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closePasteModal() {
+            const modal = document.getElementById('paste-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function openUploadModal() {
+            const modal = document.getElementById('upload-modal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeUploadModal() {
+            const modal = document.getElementById('upload-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function handleAddStudent(e) {
+            e.preventDefault();
+            const editId = document.getElementById('inp-edit-id').value;
+            const record = {
+                id: editId || ('M_' + Date.now()),
+                nama: document.getElementById('inp-nama').value.trim().toUpperCase(),
+                mykid: cleanIC(document.getElementById('inp-mykid').value),
+                kelas: document.getElementById('inp-kelas').value.trim().toUpperCase(),
+                namaBapa: document.getElementById('inp-bapa-nama').value.trim().toUpperCase(),
+                kpBapa: cleanIC(document.getElementById('inp-bapa-kp').value),
+                namaIbu: document.getElementById('inp-ibu-nama').value.trim().toUpperCase(),
+                kpIbu: cleanIC(document.getElementById('inp-ibu-kp').value),
+                telefon: document.getElementById('inp-tel').value.trim() || '-'
+            };
+
+            if (editId) {
+                const idx = students.findIndex(s => s.id === editId);
+                if (idx !== -1) students[idx] = record;
+                showToast('Rekod murid berjaya dikemaskini!');
+            } else {
+                students.unshift(record);
+                showToast('Rekod murid baharu berjaya ditambah!');
+            }
+
+            saveToStorage();
+            processFamilies();
+            closeAddModal();
+        }
+
+        function editStudent(id) {
+            const s = students.find(item => item.id === id);
+            if (!s) return;
+            document.getElementById('inp-edit-id').value = s.id;
+            document.getElementById('inp-nama').value = s.nama;
+            document.getElementById('inp-mykid').value = s.mykid;
+            document.getElementById('inp-kelas').value = s.kelas;
+            document.getElementById('inp-bapa-nama').value = s.namaBapa;
+            document.getElementById('inp-bapa-kp').value = s.kpBapa;
+            document.getElementById('inp-ibu-nama').value = s.namaIbu;
+            document.getElementById('inp-ibu-kp').value = s.kpIbu;
+            document.getElementById('inp-tel').value = s.telefon;
+            document.getElementById('modal-student-title').innerHTML = '<i class="ph-fill ph-pencil-simple text-amber-400 text-xl"></i> Kemaskini Rekod Murid';
+            document.getElementById('add-modal').classList.remove('hidden');
+        }
+
+        function deleteStudent(id) {
+            students = students.filter(s => s.id !== id);
+            saveToStorage();
+            processFamilies();
+            showToast('Rekod murid telah dipadam.');
+        }
+
+        function clearAllData() {
+            students = [];
+            saveToStorage();
+            processFamilies();
+            showToast('Semua data murid telah dikosongkan.');
+        }
+
+        function fillSamplePaste() {
+            const sample = [
+                'MUHAMMAD HARITH BIN ZAINAL\t140211025112\t6 BESTARI\tZAINAL BIN ABIDIN\t810303025441\tSURAYA BINTI DAUD\t830505026118\t012-4455667',
+                'NUR HANA HUMAIRA BINTI ZAINAL\t170819026224\t3 CEMERLANG\tZAINAL BIN ABIDIN\t810303025441\tSURAYA BINTI DAUD\t830505026118\t012-4455667'
+            ].join('\n');
+            const ta = document.getElementById('paste-textarea');
+            if (ta) ta.value = sample;
+        }
+
+        function processPastedData() {
+            const ta = document.getElementById('paste-textarea');
+            if (!ta) return;
+            const raw = ta.value.trim();
+            if (!raw) {
+                showToast('Sila tampal baris data daripada Excel terlebih dahulu.');
+                return;
+            }
+            const replaceAllEl = document.getElementById('paste-replace-all');
+            const replaceAll = replaceAllEl ? replaceAllEl.checked : false;
+            const lines = raw.split(/\r\n|\n/).filter(l => l.trim() !== '');
+            const added = [];
+
+            lines.forEach((line, idx) => {
+                const cols = line.includes('\t') ? line.split('\t').map(c => c.trim()) : parseCSVRow(line);
+                if (idx === 0 && (cols[0].toLowerCase().includes('nama') || (cols[1] && cols[1].toLowerCase().includes('mykid')))) {
+                    return;
+                }
+                if (cols.length >= 4 && cols[0]) {
+                    added.push({
+                        id: 'PST_' + Date.now() + '_' + idx,
+                        nama: cols[0].toUpperCase(),
+                        mykid: cleanIC(cols[1] || ''),
+                        kelas: (cols[2] || 'TIADA KELAS').toUpperCase(),
+                        namaBapa: (cols[3] || '').toUpperCase(),
+                        kpBapa: cleanIC(cols[4] || ''),
+                        namaIbu: (cols[5] || '').toUpperCase(),
+                        kpIbu: cleanIC(cols[6] || ''),
+                        telefon: cols[7] || '-'
+                    });
+                }
+            });
+
+            if (added.length === 0) {
+                showToast('Tiada baris sah dapat diproses. Semak susunan lajur.');
+                return;
+            }
+
+            if (replaceAll) {
+                students = added;
+            } else {
+                students = [...added, ...students];
+            }
+
+            saveToStorage();
+            processFamilies();
+            closePasteModal();
+            ta.value = '';
+            showToast(`Berjaya memasukkan ${added.length} rekod murid!`);
+        }
+
+        function handleCSVFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split(/\r\n|\n/).filter(l => l.trim() !== '');
+                const imported = [];
+                lines.forEach((line, idx) => {
+                    const cols = parseCSVRow(line);
+                    if (idx === 0 && cols[0].toLowerCase().includes('nama')) return;
+                    if (cols.length >= 4 && cols[0]) {
+                        imported.push({
+                            id: 'CSV_' + Date.now() + '_' + idx,
+                            nama: cols[0].toUpperCase(),
+                            mykid: cleanIC(cols[1] || ''),
+                            kelas: (cols[2] || 'TIADA KELAS').toUpperCase(),
+                            namaBapa: (cols[3] || '').toUpperCase(),
+                            kpBapa: cleanIC(cols[4] || ''),
+                            namaIbu: (cols[5] || '').toUpperCase(),
+                            kpIbu: cleanIC(cols[6] || ''),
+                            telefon: cols[7] || '-'
+                        });
+                    }
+                });
+                if (imported.length > 0) {
+                    students = imported;
+                    saveToStorage();
+                    processFamilies();
+                    closeUploadModal();
+                    showToast(`Berjaya import ${imported.length} rekod murid daripada CSV!`);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function downloadTemplateCSV() {
+            const header = 'Nama Murid,MyKid,Kelas,Nama Bapa,No KP Bapa,Nama Ibu,No KP Ibu,No Telefon\n';
+            const sample = 'MUHAMMAD DANISH BIN AHMAD,140312025119,6 BESTARI,AHMAD BIN HASSAN,820512025431,NORAINI BINTI KAMARUDIN,840819026122,012-4518890\n' +
+                           'NUR DAMIA BINTI AHMAD,160722026314,4 CEMERLANG,AHMAD BIN HASSAN,820512025431,NORAINI BINTI KAMARUDIN,840819026122,012-4518890\n';
+            const blob = new Blob([header + sample], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Templat_eWaris_Sekolah.csv';
+            a.click();
+        }
+
+        function exportFamilyCSV() {
+            let csv = 'No KP Waris,Nama Waris,No Telefon,Bilangan Anak,Status Keluarga,Status PIBG,Senarai Anak & Kelas\n';
+            groupedFamilies.forEach(f => {
+                const senarai = f.anak.map(a => `${a.nama} (${a.kelas})`).join(' | ');
+                const status = f.lebihSatu ? `LEBIH 1 ANAK (${f.jumlahAnak})` : '1 ANAK';
+                const pibg = f.isPaid ? 'SELESAI BAYAR' : 'BELUM BAYAR';
+                csv += `" '${f.utamaKP}","${f.utamaNama}","${f.telefon}",${f.jumlahAnak},"${status}","${pibg}","${senarai}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Laporan_Keluarga_eWaris.csv';
+            a.click();
+        }
+
+        function copyCode(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            const text = el.innerText;
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('Kod / Formula berjaya disalin!');
+        }
+
+        function openSheetSyncModal() {
+            const urlInp = document.getElementById('inp-sheet-url');
+            const intervalInp = document.getElementById('inp-sync-interval');
+            const btnDisconnect = document.getElementById('btn-disconnect-sheet');
+
+            if (urlInp) urlInp.value = googleSheetConfig.url || '';
+            if (intervalInp) intervalInp.value = googleSheetConfig.intervalSec || 60;
+            if (btnDisconnect) {
+                if (googleSheetConfig.url) btnDisconnect.classList.remove('hidden');
+                else btnDisconnect.classList.add('hidden');
+            }
+            const modal = document.getElementById('sheet-sync-modal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeSheetSyncModal() {
+            const modal = document.getElementById('sheet-sync-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function saveAndConnectGoogleSheet() {
+            const urlInp = document.getElementById('inp-sheet-url');
+            const intervalInp = document.getElementById('inp-sync-interval');
+            if (!urlInp) return;
+            let rawUrl = urlInp.value.trim();
+            const intervalSec = intervalInp ? parseInt(intervalInp.value) || 60 : 60;
+
+            if (!rawUrl) {
+                showToast('Sila masukkan pautan URL Google Sheets.');
+                return;
+            }
+
+            let csvUrl = rawUrl;
+            if (rawUrl.includes('/edit')) {
+                csvUrl = rawUrl.split('/edit')[0] + '/export?format=csv';
+            } else if (!rawUrl.includes('output=csv') && !rawUrl.includes('format=csv')) {
+                if (rawUrl.includes('?')) {
+                    csvUrl = rawUrl + '&output=csv';
+                } else {
+                    csvUrl = rawUrl + '/export?format=csv';
+                }
+            }
+
+            googleSheetConfig = {
+                url: csvUrl,
+                intervalSec: intervalSec,
+                lastSync: 'Baru sahaja'
+            };
+
+            localStorage.setItem('ewaris_gsheet_config', JSON.stringify(googleSheetConfig));
+            closeSheetSyncModal();
+            updateSyncUI();
+            setupAutoSyncTimer();
+            syncFromGoogleSheet(true);
+        }
+
+        function disconnectGoogleSheet() {
+            googleSheetConfig = { url: '', intervalSec: 60, lastSync: null };
+            localStorage.removeItem('ewaris_gsheet_config');
+            if (syncTimerId) clearInterval(syncTimerId);
+            closeSheetSyncModal();
+            updateSyncUI();
+            showToast('Sambungan Google Sheets diputuskan.');
+        }
+
+        function setupAutoSyncTimer() {
+            if (syncTimerId) clearInterval(syncTimerId);
+            if (googleSheetConfig.url && googleSheetConfig.intervalSec > 0) {
+                syncTimerId = setInterval(() => {
+                    syncFromGoogleSheet(false);
+                }, googleSheetConfig.intervalSec * 1000);
+            }
+        }
+
+        function syncFromGoogleSheet(showAlert = true) {
+            if (!googleSheetConfig.url) {
+                if (showAlert) showToast('Tiada pautan Google Sheets disambungkan.');
+                return;
+            }
+
+            if (showAlert) showToast('Sedang menarik data terkini dari Google Sheets...');
+
+            fetch(googleSheetConfig.url)
+                .then(response => {
+                    if (!response.ok) throw new Error('Gagal mengakses fail Google Sheets.');
+                    return response.text();
+                })
+                .then(text => {
+                    const lines = text.split(/\r\n|\n/).filter(l => l.trim() !== '');
+                    const imported = [];
+                    lines.forEach((line, idx) => {
+                        const cols = parseCSVRow(line);
+                        if (idx === 0 && (cols[0].toLowerCase().includes('nama') || (cols[1] && cols[1].toLowerCase().includes('mykid')))) {
+                            return;
+                        }
+                        if (cols.length >= 4 && cols[0]) {
+                            imported.push({
+                                id: 'GS_' + idx + '_' + Date.now(),
+                                nama: cols[0].toUpperCase(),
+                                mykid: cleanIC(cols[1] || ''),
+                                kelas: (cols[2] || 'TIADA KELAS').toUpperCase(),
+                                namaBapa: (cols[3] || '').toUpperCase(),
+                                kpBapa: cleanIC(cols[4] || ''),
+                                namaIbu: (cols[5] || '').toUpperCase(),
+                                kpIbu: cleanIC(cols[6] || ''),
+                                telefon: cols[7] || '-'
+                            });
+                        }
+                    });
+
+                    if (imported.length > 0) {
+                        students = imported;
+                        saveToStorage();
+                        processFamilies();
+                        const now = new Date();
+                        googleSheetConfig.lastSync = now.toLocaleTimeString();
+                        localStorage.setItem('ewaris_gsheet_config', JSON.stringify(googleSheetConfig));
+                        updateSyncUI();
+                        if (showAlert) showToast(`Berjaya sinkronisasi ${imported.length} rekod murid dari Google Sheets!`);
+                    } else {
+                        if (showAlert) showToast('Amaran: Tiada data sah dijumpai di dalam Google Sheets.');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    if (showAlert) showToast('Ralat sambungan: ' + err.message);
+                });
+        }
+
+        function parseCSVRow(text) {
+            const result = [];
+            let insideQuote = false;
+            let entry = '';
+            for (let i = 0; i < text.length; i++) {
+                const c = text[i];
+                if (c === '"') {
+                    insideQuote = !insideQuote;
+                } else if (c === ',' && !insideQuote) {
+                    result.push(entry.trim().replace(/^"|"$/g, ''));
+                    entry = '';
+                } else {
+                    entry += c;
+                }
+            }
+            result.push(entry.trim().replace(/^"|"$/g, ''));
+            return result;
+        }
+
+        function updateSyncUI() {
+            const banner = document.getElementById('live-sync-banner');
+            const label = document.getElementById('sync-status-label');
+            const timestampEl = document.getElementById('live-sync-timestamp');
+
+            if (googleSheetConfig.url) {
+                if (banner) banner.classList.remove('hidden');
+                if (label) label.textContent = 'Google Sheets: Aktif';
+                const timeStr = googleSheetConfig.lastSync || 'Sedang menyemak...';
+                const intervalText = googleSheetConfig.intervalSec > 0 ? `Auto-semak setiap ${googleSheetConfig.intervalSec} saat` : 'Mod Manual';
+                if (timestampEl) timestampEl.textContent = `Kemaskini terakhir: ${timeStr} • ${intervalText}`;
+            } else {
+                if (banner) banner.classList.add('hidden');
+                if (label) label.textContent = 'Sambung Google Sheets (Live)';
+            }
+        }
+
+        // Initialize application on window load
+        window.onload = function() {
+            try {
+                const savedStudents = localStorage.getItem('ewaris_students_data');
+                const savedPaid = localStorage.getItem('ewaris_paid_families');
+                const savedConfig = localStorage.getItem('ewaris_gsheet_config');
+
+                if (savedStudents) {
+                    students = JSON.parse(savedStudents);
+                } else {
+                    loadSampleData(false);
+                }
+
+                if (savedPaid) {
+                    paidFamiliesMap = JSON.parse(savedPaid);
+                }
+
+                if (savedConfig) {
+                    googleSheetConfig = JSON.parse(savedConfig);
+                    updateSyncUI();
+                    setupAutoSyncTimer();
+                }
+            } catch (e) {
+                console.error('Error loading storage, using sample data:', e);
+                loadSampleData(false);
+            }
+
+            processFamilies();
+        };
+    </script>
+</body>
+</html>
