@@ -356,7 +356,8 @@
                     }
 
                     window.firebaseDb = db;
-                    window.firebaseDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'ewaris_state');
+                    // FIX: Ensure correct 6-segment path for shared public artifact storage across all devices
+                    window.firebaseDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'ewaris_live_sync_db');
                     window.isCloudSynced = true;
 
                     // Fetch initial cloud data immediately
