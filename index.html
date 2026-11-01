@@ -228,19 +228,22 @@
                 <button onclick="closeSheetSyncModal()" class="text-slate-400 hover:text-slate-600 text-xl p-1"><i class="ph-bold ph-x"></i></button>
             </div>
             <div class="space-y-3 text-xs text-slate-600">
-                <p>Masukkan pautan publik Google Sheets (format CSV atau Web Published) untuk menyelaraskan data murid sekolah secara langsung:</p>
+                <p>Masukkan pautan publik Google Sheets (format CSV atau Web Published) untuk menyelaraskan data murid sekolah secara langsung & automatik:</p>
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">URL Google Sheets (CSV / Published):</label>
                     <input type="text" id="sync-url-input" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono">
                 </div>
-                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-900 space-y-1">
-                    <p class="font-bold">Format Lajur Sheet yang Diperlukan:</p>
-                    <p>Nama Murid | MyKid | Kelas | Nama Waris | No. KP Waris | No. Telefon</p>
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-emerald-900 space-y-1">
+                    <p class="font-bold flex items-center gap-1.5"><i class="ph-bold ph-lightning text-emerald-600"></i> Auto-Sync Berkala Aktif:</p>
+                    <p>Sebaik sahaja disimpan, sistem akan menyemak dan mengemaskini data daripada Google Sheet secara automatik setiap 30 saat merentas semua peranti.</p>
                 </div>
             </div>
-            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                <button onclick="closeSheetSyncModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">Batal</button>
-                <button onclick="saveAndConnectGoogleSheet()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold">Simpan & Segerak</button>
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                <button onclick="disconnectGoogleSheet()" id="disconnect-sheet-btn" class="hidden px-3 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl text-xs font-bold transition">Putus Hubungan</button>
+                <div class="flex items-center gap-2 ml-auto">
+                    <button onclick="closeSheetSyncModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">Batal</button>
+                    <button onclick="saveAndConnectGoogleSheet()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold">Simpan & Segerak</button>
+                </div>
             </div>
         </div>
     </div>
@@ -410,12 +413,18 @@
         let paidFamiliesMap = {};
         let paidStudentsMap = {};
         let isRemoteUpdate = false;
+        let activeSheetUrl = '';
+        let sheetSyncInterval = null;
 
-        window.applyCloudData = function(cloudStudents, cloudPaidFamilies, cloudPaidStudents) {
+        window.applyCloudData = function(cloudStudents, cloudPaidFamilies, cloudPaidStudents, cloudSheetUrl) {
             isRemoteUpdate = true;
             students = cloudStudents;
             paidFamiliesMap = cloudPaidFamilies || {};
             paidStudentsMap = cloudPaidStudents || {};
+            if (cloudSheetUrl && cloudSheetUrl !== activeSheetUrl) {
+                activeSheetUrl = cloudSheetUrl;
+                setupSheetAutoPoll();
+            }
             processFamilies();
             isRemoteUpdate = false;
         };
@@ -995,7 +1004,14 @@
         }
 
         function openSheetSyncModal() {
-            document.getElementById('sync-url-input').value = '';
+            const input = document.getElementById('sync-url-input');
+            input.value = activeSheetUrl || '';
+            const discBtn = document.getElementById('disconnect-sheet-btn');
+            if (activeSheetUrl) {
+                discBtn.classList.remove('hidden');
+            } else {
+                discBtn.classList.add('hidden');
+            }
             document.getElementById('sync-modal').classList.remove('hidden');
         }
 
@@ -1012,6 +1028,21 @@
             closeSheetSyncModal();
             showToast('Menghubungkan ke Google Sheets...');
             
+            activeSheetUrl = url;
+            fetchAndSyncSheet(url, true);
+            setupSheetAutoPoll();
+            saveToStorage();
+        }
+
+        function disconnectGoogleSheet() {
+            activeSheetUrl = '';
+            if (sheetSyncInterval) clearInterval(sheetSyncInterval);
+            closeSheetSyncModal();
+            saveToStorage();
+            showToast('Hubungan Auto-Sync Google Sheets diputuskan.');
+        }
+
+        function fetchAndSyncSheet(url, notify = false) {
             let fetchUrl = url;
             if (url.includes('/edit')) {
                 fetchUrl = url.replace(/\/edit.*$/, '/export?format=csv');
@@ -1020,15 +1051,27 @@
             fetch(fetchUrl)
                 .then(res => res.text())
                 .then(csvText => {
-                    parseAndLoadCSV(csvText);
-                    showToast('Berjaya segerak data dari Google Sheets!');
+                    parseAndLoadCSV(csvText, false);
+                    if (notify) showToast('Berjaya segerak data dari Google Sheets!');
                 })
                 .catch(err => {
-                    showToast('Gagal menyambung ke Google Sheets. Pastikan akses pautan adalah "Anyone with the link".');
+                    if (notify) showToast('Gagal menyambung ke Google Sheets. Pastikan akses pautan adalah "Anyone with the link".');
                 });
         }
 
-        function parseAndLoadCSV(csvText) {
+        function setupSheetAutoPoll() {
+            if (sheetSyncInterval) clearInterval(sheetSyncInterval);
+            if (!activeSheetUrl) return;
+
+            // Poll every 30 seconds for live updates from Google Sheet
+            sheetSyncInterval = setInterval(() => {
+                if (activeSheetUrl) {
+                    fetchAndSyncSheet(activeSheetUrl, false);
+                }
+            }, 30000);
+        }
+
+        function parseAndLoadCSV(csvText, notify = true) {
             const lines = csvText.split('\n');
             const newStudents = [];
 
@@ -1055,7 +1098,8 @@
                 students = newStudents;
                 saveToStorage();
                 processFamilies();
-            } else {
+                if (notify) showToast('Data murid dikemaskini daripada fail CSV.');
+            } else if (notify) {
                 showToast('Tiada rekod sah dijumpai dalam fail CSV.');
             }
         }
@@ -1078,12 +1122,14 @@
                 localStorage.setItem('ewaris_students_data', JSON.stringify(students));
                 localStorage.setItem('ewaris_paid_families', JSON.stringify(paidFamiliesMap));
                 localStorage.setItem('ewaris_paid_students', JSON.stringify(paidStudentsMap));
+                localStorage.setItem('ewaris_sheet_url', activeSheetUrl);
 
                 if (window.isCloudSynced && window.firebaseDb && window.firebaseDocRef) {
                     setDoc(window.firebaseDocRef, {
                         students: students,
                         paidFamiliesMap: paidFamiliesMap,
                         paidStudentsMap: paidStudentsMap,
+                        sheetUrl: activeSheetUrl,
                         updatedAt: new Date().toISOString()
                     }, { merge: true }).then(() => {
                         console.log('Cloud synced successfully');
@@ -1099,6 +1145,7 @@
                 const savedStudents = localStorage.getItem('ewaris_students_data');
                 const savedPaid = localStorage.getItem('ewaris_paid_families');
                 const savedPaidStudents = localStorage.getItem('ewaris_paid_students');
+                const savedSheetUrl = localStorage.getItem('ewaris_sheet_url');
 
                 if (savedStudents) {
                     students = JSON.parse(savedStudents);
@@ -1107,6 +1154,10 @@
                 }
                 if (savedPaid) paidFamiliesMap = JSON.parse(savedPaid);
                 if (savedPaidStudents) paidStudentsMap = JSON.parse(savedPaidStudents);
+                if (savedSheetUrl) {
+                    activeSheetUrl = savedSheetUrl;
+                    setupSheetAutoPoll();
+                }
             } catch (e) {
                 loadSampleData(false);
             }
