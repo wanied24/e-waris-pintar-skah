@@ -1,220 +1,518 @@
-<!-- ...เชิงป... -->
-    <script>
-        // ==========================================
-        // GLOBAL FUNCTIONS & NAVIGATION
-        // ==========================================
-        
-        // Data Contoh Realistik Sekolah Malaysia
-        const initialSampleData = [
-            {
-                id: 'M01',
-                nama: 'MUHAMMAD DANISH HAIKAL BIN AHMAD FAIZAL',
-                mykid: '140312025119',
-                kelas: '6 BESTARI',
-                namaBapa: 'AHMAD FAIZAL BIN HASSAN',
-                kpBapa: '820512025431',
-                namaIbu: 'NORAINI BINTI KAMARUDIN',
-                kpIbu: '840819026122',
-                telefon: '012-4518890'
-            },
-            {
-                id: 'M02',
-                nama: 'NUR DAMIA QAISARA BINTI AHMAD FAIZAL',
-                mykid: '160722026314',
-                kelas: '4 CEMERLANG',
-                namaBapa: 'AHMAD FAIZAL BIN HASSAN',
-                kpBapa: '820512025431',
-                namaIbu: 'NORAINI BINTI KAMARUDIN',
-                kpIbu: '840819026122',
-                telefon: '012-4518890'
-            },
-            {
-                id: 'M03',
-                nama: 'MUHAMMAD DARWISY RAYYAN BIN AHMAD FAIZAL',
-                mykid: '191104021887',
-                kelas: '1 BESTARI',
-                namaBapa: 'NORAINI BINTI KAMARUDIN',
-                kpBapa: '840819026122',
-                namaIbu: 'AHMAD FAIZAL BIN HASSAN',
-                kpIbu: '820512025431',
-                telefon: '019-4421102'
-            },
-            {
-                id: 'M04',
-                nama: 'PUTERI AUNI BATRISYIA BINTI MOHD RIZAL',
-                mykid: '150118024112',
-                kelas: '5 INTELEK',
-                namaBapa: 'MOHD RIZAL BIN ISMAIL',
-                kpBapa: '851120025991',
-                namaIbu: 'ROZITA BINTI CHE DIN',
-                kpIbu: '860304025118',
-                telefon: '013-4892210'
-            },
-            {
-                id: 'M05',
-                nama: 'PUTERA AIMAN HAZIQ BIN MOHD RIZAL',
-                mykid: '180909023311',
-                kelas: '2 GEMILANG',
-                namaBapa: 'MOHD RIZAL BIN ISMAIL',
-                kpBapa: '851120025991',
-                namaIbu: 'ROZITA BINTI CHE DIN',
-                kpIbu: '860304025118',
-                telefon: '013-4892210'
-            },
-            {
-                id: 'M06',
-                nama: 'SYED ALIFF FIRDAUS BIN SYED AZMAN',
-                mykid: '140505021921',
-                kelas: '6 CEMERLANG',
-                namaBapa: 'SYED AZMAN BIN SYED OMAR',
-                kpBapa: '790414025219',
-                namaIbu: 'SHARIFAH ZAINAB BINTI SYED ALI',
-                kpIbu: '810212026044',
-                telefon: '017-4019922'
-            },
-            {
-                id: 'M07',
-                nama: 'SYARIFAH ALYA MAISARAH BINTI SYED AZMAN',
-                mykid: '160811023442',
-                kelas: '4 BESTARI',
-                namaBapa: 'SYED AZMAN BIN SYED OMAR',
-                kpBapa: '790414025219',
-                namaIbu: 'SHARIFAH ZAINAB BINTI SYED ALI',
-                kpIbu: '810212026044',
-                telefon: '017-4019922'
-            },
-            {
-                id: 'M08',
-                nama: 'SYED AMMAR ZAKWAN BIN SYED AZMAN',
-                mykid: '171230025113',
-                kelas: '3 INTELEK',
-                namaBapa: 'SYED AZMAN BIN SYED OMAR',
-                kpBapa: '790414025219',
-                namaIbu: 'SHARIFAH ZAINAB BINTI SYED ALI',
-                kpIbu: '810212026044',
-                telefon: '017-4019922'
-            },
-            {
-                id: 'M09',
-                nama: 'SYARIFAH AMIRA SOFEA BINTI SYED AZMAN',
-                mykid: '190214026128',
-                kelas: '1 CEMERLANG',
-                namaBapa: 'SYED AZMAN BIN SYED OMAR',
-                kpBapa: '790414025219',
-                namaIbu: 'SHARIFAH ZAINAB BINTI SYED ALI',
-                kpIbu: '810212026044',
-                telefon: '017-4019922'
-            },
-            {
-                id: 'M10',
-                nama: 'CHONG WEI LIANG',
-                mykid: '150621023819',
-                kelas: '5 BESTARI',
-                namaBapa: 'CHONG KAH WAI',
-                kpBapa: '830910025771',
-                namaIbu: 'LIM MEI LING',
-                kpIbu: '850122026334',
-                telefon: '016-4112398'
-            },
-            {
-                id: 'M11',
-                nama: 'KAVINESH A/L SUBRAMANIAM',
-                mykid: '170419024911',
-                kelas: '3 BESTARI',
-                namaBapa: 'SUBRAMANIAM A/L RAMASAMY',
-                kpBapa: '811205025813',
-                namaIbu: 'KAVITHA A/P KRISHNAN',
-                kpIbu: '840715026190',
-                telefon: '012-5543120'
-            },
-            {
-                id: 'M12',
-                nama: 'NURUL IMANINA BINTI ZULKIFLI',
-                mykid: '140915021124',
-                kelas: '6 INTELEK',
-                namaBapa: 'ZULKIFLI BIN BAKAR',
-                kpBapa: '800101025119',
-                namaIbu: 'FARIDAH BINTI MANSOR',
-                kpIbu: '830618025440',
-                telefon: '011-23456789'
-            },
-            {
-                id: 'M13',
-                nama: 'MUHAMMAD HARRAZ BIN KHAIRUL ANUAR',
-                mykid: '180402023915',
-                kelas: '2 BESTARI',
-                namaBapa: 'KHAIRUL ANUAR BIN LATIFF',
-                kpBapa: '820707025337',
-                namaIbu: 'FARIDAH BINTI MANSOR',
-                kpIbu: '830618025440',
-                telefon: '011-23456789'
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0">
+    <title>Sistem Pengesanan Waris & Adik-Beradik Sekolah</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-text-size-adjust: 100%;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
             }
+            body {
+                background: white !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- Top Navigation Bar (White & Clean, Fully Responsive) -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:h-20 flex flex-col sm:flex-row items-center justify-between gap-3">
+            
+            <!-- Logo & Title -->
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                <div class="flex items-center gap-2.5">
+                    <img src="https://i.imgur.com/yMnAAhU.png" alt="Logo Sekolah" class="h-12 sm:h-16 w-auto object-contain" onerror="this.src='https://placehold.co/120x60/indigo/white?text=SEKOLAH'">
+                    <div>
+                        <h1 class="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                            <span>e-Waris Pintar</span>
+                            <span class="text-[10px] sm:text-xs bg-indigo-100 text-indigo-800 font-semibold px-2 py-0.5 rounded-full">v3.7 Omni</span>
+                        </h1>
+                        <p class="text-[11px] text-slate-500 hidden md:block">Sistem Pengesanan Waris & Status Bayaran PIBG Berkeluarga</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons (Touch Friendly) -->
+            <div class="flex items-center flex-wrap gap-2 w-full sm:w-auto justify-end">
+                <button onclick="openSheetSyncModal()" class="flex-1 sm:flex-none px-3 py-2.5 sm:py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
+                    <i class="ph-bold ph-google-logo text-emerald-600 text-base"></i>
+                    <span>Auto-Sync</span>
+                </button>
+                <button onclick="openAddModal()" class="flex-1 sm:flex-none px-3 py-2.5 sm:py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
+                    <i class="ph-bold ph-plus text-base"></i>
+                    <span>Tambah Murid</span>
+                </button>
+                <button onclick="openImportModal()" class="flex-1 sm:flex-none px-3 py-2.5 sm:py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
+                    <i class="ph-bold ph-upload-simple text-slate-500 text-base"></i>
+                    <span>Import</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 flex-grow w-full space-y-5">
+
+        <!-- Stats Overview Banner -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Jumlah Murid</p>
+                    <h3 id="stat-total-students" class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-1">0</h3>
+                </div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-lg sm:text-xl font-bold">
+                    <i class="ph-duotone ph-student"></i>
+                </div>
+            </div>
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Jumlah Keluarga</p>
+                    <h3 id="stat-total-families" class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-1">0</h3>
+                </div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 text-lg sm:text-xl font-bold">
+                    <i class="ph-duotone ph-users"></i>
+                </div>
+            </div>
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Waris 2+ Anak</p>
+                    <h3 id="stat-multi-families" class="text-xl sm:text-2xl font-extrabold text-emerald-600 mt-1">0</h3>
+                </div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-lg sm:text-xl font-bold">
+                    <i class="ph-duotone ph-users-three"></i>
+                </div>
+            </div>
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Bayaran PIBG</p>
+                    <h3 id="stat-pibg-paid" class="text-xl sm:text-2xl font-extrabold text-amber-600 mt-1">0 / 0</h3>
+                </div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 text-lg sm:text-xl font-bold">
+                    <i class="ph-duotone ph-wallet"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs & Search Controls -->
+        <div class="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-3 no-print">
+            
+            <!-- Tabs -->
+            <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl w-full lg:w-auto">
+                <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="flex-1 lg:flex-none px-4 py-2.5 rounded-lg text-xs font-bold transition bg-white text-indigo-700 shadow-sm">
+                    Papan Pemuka Keluarga
+                </button>
+                <button onclick="switchTab('students')" id="tab-btn-students" class="flex-1 lg:flex-none px-4 py-2.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900">
+                    Senarai Murid (<span id="nav-student-count">0</span>)
+                </button>
+            </div>
+
+            <!-- Search & Filters -->
+            <div class="flex flex-col sm:flex-row items-center gap-2.5 w-full lg:w-auto">
+                <div class="relative w-full sm:w-64">
+                    <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="search-input" oninput="renderDashboard()" placeholder="Cari nama waris / murid..." class="w-full pl-10 pr-8 py-2.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <button onclick="clearSearch()" id="clear-search-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1">
+                        <i class="ph-bold ph-x-circle text-base"></i>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-2 sm:flex items-center gap-2.5 w-full sm:w-auto">
+                    <select id="filter-type" onchange="renderDashboard()" class="w-full sm:w-auto py-2.5 sm:py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="all">Semua Keluarga</option>
+                        <option value="multi">Lebih 1 Anak (Adik-Beradik)</option>
+                        <option value="3plus">3+ Orang Anak</option>
+                        <option value="single">1 Anak Sahaja</option>
+                        <option value="paid">PIBG Selesai Dibayar</option>
+                        <option value="unpaid">PIBG Belum Bayar</option>
+                    </select>
+
+                    <select id="filter-class" onchange="renderDashboard()" class="w-full sm:w-auto py-2.5 sm:py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="all">Semua Kelas</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 1: Dashboard Keluarga -->
+        <div id="tab-dashboard" class="space-y-4">
+            <div class="flex items-center justify-between px-1">
+                <p id="result-badge-count" class="text-xs font-bold text-slate-500 uppercase tracking-wider">Memuatkan senarai keluarga...</p>
+                <div class="flex items-center gap-2">
+                    <button onclick="loadSampleData(true)" class="text-xs font-semibold text-indigo-600 hover:underline flex items-center gap-1">
+                        <i class="ph-bold ph-arrow-clockwise"></i> Muat Semula Data Contoh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Family Cards Grid -->
+            <div id="family-cards-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <!-- Tab 2: Senarai Murid Penuh -->
+        <div id="tab-students" class="hidden space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                                <th class="p-4">Bil</th>
+                                <th class="p-4">Nama Murid & MyKid</th>
+                                <th class="p-4">Kelas</th>
+                                <th class="p-4">Nama Waris</th>
+                                <th class="p-4">No. KP Waris</th>
+                                <th class="p-4">No. Tel</th>
+                                <th class="p-4 text-center">Status PIBG (Murid)</th>
+                                <th class="p-4 text-center no-print">Tindakan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-table-body" class="divide-y divide-slate-100 text-xs">
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-400 no-print">
+        <p>e-Waris Pintar Sistem Pengesanan Adik-Beradik & PIBG Sekolah &copy; 2026</p>
+    </footer>
+
+    <!-- Slip Cetakan Modal -->
+    <div id="slip-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full p-4 sm:p-6 space-y-5 max-h-[92vh] overflow-y-auto">
+            <div class="flex items-center justify-between no-print border-b border-slate-100 pb-3">
+                <h3 class="text-sm sm:text-base font-bold text-slate-900">Slip Pengesahan Waris & Adik-Beradik</h3>
+                <button onclick="closeSlipModal()" class="text-slate-400 hover:text-slate-600 text-xl p-1">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+            
+            <div id="slip-content" class="bg-white p-4 sm:p-6 border border-slate-200 rounded-xl space-y-4 text-xs sm:text-sm text-slate-800">
+                <!-- Slip printable content -->
+            </div>
+
+            <div class="flex items-center justify-end gap-2 sm:gap-3 no-print pt-3 border-t border-slate-100">
+                <button onclick="closeSlipModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">Tutup</button>
+                <button onclick="printOrSavePDF()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                    <i class="ph-bold ph-file-pdf"></i> Simpan PDF / Cetak Slip
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Sheet Sync Modal -->
+    <div id="sync-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+                    <i class="ph-bold ph-google-logo text-emerald-600 text-lg sm:text-xl"></i> Sambung Google Sheets (Live Sync)
+                </h3>
+                <button onclick="closeSheetSyncModal()" class="text-slate-400 hover:text-slate-600 text-xl p-1"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <div class="space-y-3 text-xs text-slate-600">
+                <p>Masukkan pautan publik Google Sheets (format CSV atau Web Published) untuk menyelaraskan data murid sekolah secara langsung:</p>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">URL Google Sheets (CSV / Published):</label>
+                    <input type="text" id="sync-url-input" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono">
+                </div>
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-900 space-y-1">
+                    <p class="font-bold">Format Lajur Sheet yang Diperlukan:</p>
+                    <p>Nama Murid | MyKid | Kelas | Nama Waris | No. KP Waris | No. Telefon</p>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button onclick="closeSheetSyncModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">Batal</button>
+                <button onclick="saveAndConnectGoogleSheet()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold">Simpan & Segerak</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Student Modal -->
+    <div id="student-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full p-5 sm:p-6 space-y-4 max-h-[92vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 id="student-modal-title" class="text-sm sm:text-base font-bold text-slate-900">Tambah Rekod Murid Baharu</h3>
+                <button onclick="closeStudentModal()" class="text-slate-400 hover:text-slate-600 text-xl p-1"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <form id="student-form" onsubmit="saveStudentForm(event)" class="space-y-3.5 text-xs">
+                <input type="hidden" id="edit-student-id">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Nama Penuh Murid:</label>
+                        <input type="text" id="form-nama" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl" placeholder="Ahmad bin Ali">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">No. MyKid:</label>
+                        <input type="text" id="form-mykid" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl" placeholder="140101011111">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Kelas:</label>
+                        <input type="text" id="form-kelas" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl" placeholder="5 Cemerlang">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">No. Telefon Waris:</label>
+                        <input type="text" id="form-telefon" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl" placeholder="0123456789">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Nama Bapa / Penjaga Utama:</label>
+                        <input type="text" id="form-namaBapa" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl" placeholder="Ali bin Abu">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">No. KP Bapa / Penjaga Utama:</label>
+                        <input type="text" id="form-kpBapa" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl" placeholder="750101012222">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Nama Ibu (Pilihan):</label>
+                        <input type="text" id="form-namaIbu" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl" placeholder="Siti binti Ahmad">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">No. KP Ibu (Pilihan):</label>
+                        <input type="text" id="form-kpIbu" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl" placeholder="780202023333">
+                    </div>
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeStudentModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold">Simpan Rekod</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Import CSV Modal -->
+    <div id="import-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+                    <i class="ph-bold ph-upload-simple text-indigo-600 text-lg sm:text-xl"></i> Import Fail CSV Murid
+                </h3>
+                <button onclick="closeImportModal()" class="text-slate-400 hover:text-slate-600 text-xl p-1"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <div class="space-y-3 text-xs text-slate-600">
+                <p>Muat naik fail CSV yang mengandungi senarai murid dan maklumat waris sekolah anda:</p>
+                <div>
+                    <input type="file" id="csv-file-input" accept=".csv" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button onclick="closeImportModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold">Batal</button>
+                <button onclick="processUploadedCSV()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold">Proses Fail</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl text-xs font-bold transition flex items-center gap-2">
+        <i class="ph-fill ph-check-circle text-emerald-400 text-base"></i>
+        <span id="toast-msg">Mesej berjaya</span>
+    </div>
+
+    <!-- Firebase SDK & App Script Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        let app, db, auth;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'sekolah-ewaris-app-2026';
+
+        window.isCloudSynced = false;
+
+        try {
+            if (typeof __firebase_config !== 'undefined') {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                window.firebaseDb = db;
+                window.firebaseDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'ewaris_state');
+                window.isCloudSynced = true;
+
+                // Real-time listener for multi-device sync
+                onSnapshot(window.firebaseDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        if (data.students && Array.isArray(data.students)) {
+                            window.applyCloudData(data.students, data.paidFamiliesMap || {}, data.paidStudentsMap || {});
+                        }
+                    }
+                }, (error) => {
+                    console.warn('Firestore snapshot notice:', error);
+                });
+            }
+        } catch (e) {
+            console.warn('Firebase cloud sync fallback to local mode:', e);
+        }
+    </script>
+
+    <script>
+        const initialSampleData = [
+            { id: 'M1', nama: 'Ahmad Ziqri bin Razak', mykid: '140101011111', kelas: '5 Cemerlang', namaBapa: 'Razak bin Abu', kpBapa: '750101012222', namaIbu: 'Siti binti Ali', kpIbu: '780202023333', telefon: '0123456789' },
+            { id: 'M2', nama: 'Nurul Ain binti Razak', mykid: '160202022222', kelas: '3 Pintar', namaBapa: 'Razak bin Abu', kpBapa: '750101012222', namaIbu: 'Siti binti Ali', kpIbu: '780202023333', telefon: '0123456789' },
+            { id: 'M3', nama: 'Muhammad Danish bin Razak', mykid: '180303033333', kelas: '1 Wawasan', namaBapa: 'Razak bin Abu', kpBapa: '750101012222', namaIbu: 'Siti binti Ali', kpIbu: '780202023333', telefon: '0123456789' },
+            { id: 'M4', nama: 'Farah Hani binti Zulkifli', mykid: '150404044444', kelas: '4 Cemerlang', namaBapa: 'Zulkifli bin Omar', kpBapa: '800404045555', namaIbu: 'Aminah binti Hassan', kpIbu: '820505056666', telefon: '0198765432' },
+            { id: 'M5', nama: 'Amirul Hakim bin Zulkifli', mykid: '170505055555', kelas: '2 Gemilang', namaBapa: 'Zulkifli bin Omar', kpBapa: '800404045555', namaIbu: 'Aminah binti Hassan', kpIbu: '820505056666', telefon: '0198765432' },
+            { id: 'M6', nama: 'Siti Nur Aisyah binti Rahman', mykid: '150606066666', kelas: '4 Pintar', namaBapa: 'Rahman bin Kassim', kpBapa: '760606067777', namaIbu: 'Zaleha binti Osman', kpIbu: '790707078888', telefon: '0171122334' },
+            { id: 'M7', nama: 'Haziq bin Rosli', mykid: '140707077777', kelas: '5 Wawasan', namaBapa: 'Rosli bin Ahmad', kpBapa: '720808089999', namaIbu: 'Fatimah binti Mydin', kpIbu: '750909091111', telefon: '01122334455' }
         ];
 
         let students = [];
         let groupedFamilies = [];
         let studentFamilyMap = {};
         let paidFamiliesMap = {};
-        let googleSheetConfig = {
-            url: '',
-            intervalSec: 60,
-            lastSync: null
+        let paidStudentsMap = {};
+        let isRemoteUpdate = false;
+
+        window.applyCloudData = function(cloudStudents, cloudPaidFamilies, cloudPaidStudents) {
+            isRemoteUpdate = true;
+            students = cloudStudents;
+            paidFamiliesMap = cloudPaidFamilies || {};
+            paidStudentsMap = cloudPaidStudents || {};
+            processFamilies();
+            isRemoteUpdate = false;
         };
-        let syncTimerId = null;
+
+        function openAddModal() {
+            document.getElementById('student-modal-title').textContent = 'Tambah Rekod Murid Baharu';
+            document.getElementById('edit-student-id').value = '';
+            document.getElementById('student-form').reset();
+            document.getElementById('student-modal').classList.remove('hidden');
+        }
+
+        function closeStudentModal() {
+            document.getElementById('student-modal').classList.add('hidden');
+        }
+
+        function openImportModal() {
+            document.getElementById('import-modal').classList.remove('hidden');
+        }
+
+        function closeImportModal() {
+            document.getElementById('import-modal').classList.add('hidden');
+        }
+
+        function saveStudentForm(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-student-id').value;
+            const nama = document.getElementById('form-nama').value.trim();
+            const mykid = document.getElementById('form-mykid').value.trim();
+            const kelas = document.getElementById('form-kelas').value.trim();
+            const telefon = document.getElementById('form-telefon').value.trim();
+            const namaBapa = document.getElementById('form-namaBapa').value.trim();
+            const kpBapa = document.getElementById('form-kpBapa').value.trim();
+            const namaIbu = document.getElementById('form-namaIbu').value.trim();
+            const kpIbu = document.getElementById('form-kpIbu').value.trim();
+
+            if (id) {
+                const s = students.find(item => item.id === id);
+                if (s) {
+                    s.nama = nama;
+                    s.mykid = mykid;
+                    s.kelas = kelas;
+                    s.telefon = telefon;
+                    s.namaBapa = namaBapa;
+                    s.kpBapa = kpBapa;
+                    s.namaIbu = namaIbu;
+                    s.kpIbu = kpIbu;
+                }
+                showToast('Maklumat murid berjaya dikemaskini.');
+            } else {
+                const newStudent = {
+                    id: 'M_' + Date.now(),
+                    nama, mykid, kelas, telefon, namaBapa, kpBapa, namaIbu, kpIbu
+                };
+                students.push(newStudent);
+                showToast('Murid baharu berjaya didaftarkan.');
+            }
+
+            closeStudentModal();
+            saveToStorage();
+            processFamilies();
+        }
+
+        function processUploadedCSV() {
+            const fileInput = document.getElementById('csv-file-input');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showToast('Sila pilih fail CSV terlebih dahulu.');
+                return;
+            }
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                parseAndLoadCSV(e.target.result);
+                closeImportModal();
+            };
+            reader.readAsText(file);
+        }
 
         function loadSampleData(notify = false) {
             students = JSON.parse(JSON.stringify(initialSampleData));
+            paidStudentsMap = {};
             saveToStorage();
             processFamilies();
-            if (notify) showToast('Data contoh sekolah telah dimuatkan semula.');
+            if (notify) showToast('Data contoh sekolah berjaya dimuatkan.');
         }
 
         function switchTab(tab) {
-            ['dashboard', 'students', 'guide'].forEach(t => {
-                const sec = document.getElementById(`tab-${t}`);
-                if (sec) sec.classList.add('hidden');
-                const btn = document.getElementById(`tab-btn-${t}`);
-                if (btn) {
-                    btn.className = 'px-3.5 py-2 rounded-xl text-sm font-medium text-indigo-100 hover:bg-indigo-800 transition flex items-center gap-1.5';
-                }
-            });
-            const activeSec = document.getElementById(`tab-${tab}`);
-            if (activeSec) activeSec.classList.remove('hidden');
-            const activeBtn = document.getElementById(`tab-btn-${tab}`);
-            if (activeBtn) {
-                activeBtn.className = 'px-3.5 py-2 rounded-xl text-sm font-medium bg-indigo-700 text-white shadow-sm transition flex items-center gap-1.5';
+            const dashTab = document.getElementById('tab-dashboard');
+            const studTab = document.getElementById('tab-students');
+            const btnDash = document.getElementById('tab-btn-dashboard');
+            const btnStud = document.getElementById('tab-btn-students');
+
+            if (tab === 'dashboard') {
+                dashTab.classList.remove('hidden');
+                studTab.classList.add('hidden');
+                btnDash.className = 'flex-1 lg:flex-none px-4 py-2.5 rounded-lg text-xs font-bold transition bg-white text-indigo-700 shadow-sm';
+                btnStud.className = 'flex-1 lg:flex-none px-4 py-2.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900';
+            } else {
+                dashTab.classList.add('hidden');
+                studTab.classList.remove('hidden');
+                btnStud.className = 'flex-1 lg:flex-none px-4 py-2.5 rounded-lg text-xs font-bold transition bg-white text-indigo-700 shadow-sm';
+                btnDash.className = 'flex-1 lg:flex-none px-4 py-2.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900';
             }
         }
 
-        function cleanIC(str) {
-            if (!str) return '';
-            return String(str).replace(/[-\s]/g, '').trim();
+        function cleanIC(ic) {
+            if (!ic) return '';
+            return ic.toString().replace(/[-\s]/g, '').trim();
         }
 
         function formatIC(ic) {
-            const c = cleanIC(ic);
-            if (c.length === 12) {
-                return `${c.slice(0, 6)}-${c.slice(6, 8)}-${c.slice(8, 12)}`;
+            const clean = cleanIC(ic);
+            if (clean.length === 12) {
+                return `${clean.substring(0,6)}-${clean.substring(6,8)}-${clean.substring(8)}`;
             }
-            return c || '-';
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            const msgEl = document.getElementById('toast-message');
-            if (!toast || !msgEl) return;
-            msgEl.textContent = msg;
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3200);
-        }
-
-        function saveToStorage() {
-            try {
-                localStorage.setItem('ewaris_students_data', JSON.stringify(students));
-                localStorage.setItem('ewaris_paid_families', JSON.stringify(paidFamiliesMap));
-            } catch (e) {}
+            return ic;
         }
 
         function processFamilies() {
@@ -276,6 +574,15 @@
                     }
                 }
 
+                let familyPaidStudentId = null;
+                const isFamilyPaid = memberList.some(m => {
+                    if (paidStudentsMap[m.id] || (paidFamiliesMap[utamaKP] && m === memberList[0])) {
+                        familyPaidStudentId = m.id;
+                        return true;
+                    }
+                    return false;
+                });
+
                 const familyObj = {
                     id: 'KEL_' + utamaKP,
                     utamaKP,
@@ -287,14 +594,14 @@
                     jumlahAnak: memberList.length,
                     lebihSatu: memberList.length > 1,
                     crossMatchNote,
-                    isPaid: !!paidFamiliesMap[utamaKP]
+                    isPaid: isFamilyPaid,
+                    paidStudentId: familyPaidStudentId
                 };
 
                 groupedFamilies.push(familyObj);
-                memberList.forEach((m, idxInFam) => {
+                memberList.forEach((m) => {
                     studentFamilyMap[m.id] = {
-                        family: familyObj,
-                        isRepresentative: idxInFam === 0
+                        family: familyObj
                     };
                 });
             }
@@ -302,65 +609,36 @@
             groupedFamilies.sort((a, b) => b.jumlahAnak - a.jumlahAnak);
 
             populateClassFilter();
-            checkDataQuality();
             updateStats();
             renderDashboard();
             renderStudentTable();
         }
 
         function populateClassFilter() {
+            const classSet = new Set();
+            students.forEach(s => { if (s.kelas) classSet.add(s.kelas.trim()); });
             const select = document.getElementById('filter-class');
-            if (!select) return;
             const currentVal = select.value;
-            const classes = Array.from(new Set(students.map(s => (s.kelas || '').trim().toUpperCase()).filter(Boolean))).sort();
-            select.innerHTML = '<option value="all">Semua Kelas</option>' +
-                classes.map(c => `<option value="${c}">${c}</option>`).join('');
-            if (classes.includes(currentVal)) {
-                select.value = currentVal;
-            }
-        }
-
-        function checkDataQuality() {
-            const banner = document.getElementById('data-quality-banner');
-            const textEl = document.getElementById('data-quality-text');
-            if (!banner || !textEl) return;
-            const invalidCount = students.filter(s => {
-                const kp1 = cleanIC(s.kpBapa);
-                const kp2 = cleanIC(s.kpIbu);
-                return (!kp1 || kp1.length < 6) && (!kp2 || kp2.length < 6);
-            }).length;
-
-            if (invalidCount > 0) {
-                banner.classList.remove('hidden');
-                textEl.textContent = `Dikesan ${invalidCount} rekod murid yang tiada No. KP Waris yang lengkap. Sila kemaskini untuk ketepatan pengesanan adik-beradik.`;
-            } else {
-                banner.classList.add('hidden');
-            }
+            
+            let html = '<option value="all">Semua Kelas</option>';
+            Array.from(classSet).sort().forEach(c => {
+                html += `<option value="${c}">${c}</option>`;
+            });
+            select.innerHTML = html;
+            select.value = currentVal;
         }
 
         function updateStats() {
             const totalStudents = students.length;
             const totalFamilies = groupedFamilies.length;
             const multiFamilies = groupedFamilies.filter(f => f.lebihSatu).length;
-            const multiStudents = groupedFamilies.filter(f => f.lebihSatu).reduce((acc, f) => acc + f.jumlahAnak, 0);
             const paidCount = groupedFamilies.filter(f => f.isPaid).length;
-            const percentage = totalFamilies > 0 ? Math.round((multiFamilies / totalFamilies) * 100) : 0;
 
-            const el1 = document.getElementById('stat-total-students');
-            const elNav = document.getElementById('nav-student-count');
-            const elFam = document.getElementById('stat-total-families');
-            const elMulti = document.getElementById('stat-multi-families');
-            const elPerc = document.getElementById('stat-multi-percentage');
-            const elPaid = document.getElementById('stat-pibg-paid');
-            const elMultiStu = document.getElementById('stat-multi-students');
-
-            if (el1) el1.textContent = totalStudents;
-            if (elNav) elNav.textContent = totalStudents;
-            if (elFam) elFam.textContent = totalFamilies;
-            if (elMulti) elMulti.textContent = multiFamilies;
-            if (elPerc) elPerc.textContent = `${percentage}%`;
-            if (elPaid) elPaid.textContent = `${paidCount} / ${totalFamilies}`;
-            if (elMultiStu) elMultiStu.textContent = `${multiStudents} Murid`;
+            document.getElementById('stat-total-students').textContent = totalStudents;
+            document.getElementById('nav-student-count').textContent = totalStudents;
+            document.getElementById('stat-total-families').textContent = totalFamilies;
+            document.getElementById('stat-multi-families').textContent = multiFamilies;
+            document.getElementById('stat-pibg-paid').textContent = `${paidCount} / ${totalFamilies}`;
         }
 
         function renderDashboard() {
@@ -387,7 +665,7 @@
                 if (filterType === 'paid' && !f.isPaid) return false;
 
                 if (filterClass !== 'all') {
-                    const hasClass = f.anak.some(a => (a.kelas || '').toUpperCase() === filterClass);
+                    const hasClass = f.anak.some(a => (a.kelas || '').toUpperCase() === filterClass.toUpperCase());
                     if (!hasClass) return false;
                 }
 
@@ -406,10 +684,8 @@
                 return matchWaris || matchAnak;
             });
 
-            const badgeCount = document.getElementById('result-badge-count');
-            if (badgeCount) badgeCount.textContent = `${filtered.length} keluarga ditemui`;
+            document.getElementById('result-badge-count').textContent = `${filtered.length} keluarga ditemui`;
             const container = document.getElementById('family-cards-container');
-            if (!container) return;
 
             if (filtered.length === 0) {
                 container.innerHTML = `
@@ -430,34 +706,58 @@
                     ? `LEBIH 1 ANAK (${f.jumlahAnak} BERADIK)`
                     : '1 ANAK DI SEKOLAH';
 
-                const pibgBtnClass = f.isPaid
-                    ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                    : 'bg-amber-100 text-amber-900 hover:bg-amber-200 border border-amber-300';
+                const anakRows = f.anak.map((a) => {
+                    const isThisStudentPaid = paidStudentsMap[a.id] || (f.paidStudentId === a.id);
+                    let badgeText = 'Belum Dipilih';
+                    let badgeClass = 'bg-slate-100 text-slate-500';
 
-                const anakRows = f.anak.map((a, idx) => `
-                    <div class="flex items-center justify-between py-2 px-3 rounded-xl ${idx === 0 ? 'bg-indigo-50/70 border border-indigo-100' : 'bg-slate-50 border border-slate-100'}">
-                        <div class="min-w-0 pr-2">
-                            <p class="text-xs font-bold text-slate-800 truncate">${idx + 1}. ${a.nama}</p>
-                            <p class="text-[11px] text-slate-500 font-mono">MyKid: ${formatIC(a.mykid)} • <span class="font-semibold text-indigo-700">${a.kelas}</span></p>
+                    if (f.isPaid) {
+                        if (isThisStudentPaid) {
+                            badgeText = 'Pembayar PIBG';
+                            badgeClass = 'bg-emerald-600 text-white';
+                        } else {
+                            badgeText = 'Dikecualikan Bayar PIBG';
+                            badgeClass = 'bg-blue-100 text-blue-800';
+                        }
+                    }
+
+                    return `
+                        <div class="flex items-center justify-between py-2 px-3 rounded-xl ${isThisStudentPaid ? 'bg-emerald-50 border border-emerald-200' : 'bg-slate-50 border border-slate-100'}">
+                            <div class="min-w-0 pr-2">
+                                <p class="text-xs font-bold text-slate-800 truncate">${a.nama}</p>
+                                <p class="text-[11px] text-slate-500 font-mono">MyKid: ${formatIC(a.mykid)} • <span class="font-semibold text-indigo-700">${a.kelas}</span></p>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase ${badgeClass}">
+                                    ${badgeText}
+                                </span>
+                                ${!f.isPaid ? `
+                                    <button onclick="toggleStudentPibg('${a.id}', '${f.utamaKP}')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 active:scale-95" title="Pilih sebagai pembayar">
+                                        <i class="ph-bold ph-square"></i> Pilih Bayar
+                                    </button>
+                                ` : ''}
+                            </div>
                         </div>
-                        <span class="shrink-0 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase ${idx === 0 ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-700'}">
-                            ${idx === 0 ? 'Wakil PIBG' : 'Dikecualikan'}
-                        </span>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
 
                 return `
-                    <div class="bg-white rounded-2xl shadow-sm border ${f.lebihSatu ? 'border-emerald-200' : 'border-slate-200'} p-5 flex flex-col justify-between space-y-4">
+                    <div class="bg-white rounded-2xl shadow-sm border ${f.isPaid ? 'border-emerald-300 bg-emerald-50/20' : (f.lebihSatu ? 'border-emerald-200' : 'border-slate-200')} p-4 sm:p-5 flex flex-col justify-between space-y-4">
                         <div class="space-y-3">
-                            <div class="flex items-start justify-between gap-2">
+                            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
                                 <div>
                                     <span class="inline-block text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border ${badgeColor}">
                                         ${statusLabel}
                                     </span>
-                                    <h4 class="text-base font-bold text-slate-900 mt-1.5">${f.utamaNama}</h4>
+                                    <h4 class="text-sm sm:text-base font-bold text-slate-900 mt-1.5">${f.utamaNama}</h4>
                                     <p class="text-xs text-slate-500 font-mono">No. KP Waris: <strong class="text-slate-700">${formatIC(f.utamaKP)}</strong> • Tel: ${f.telefon}</p>
                                     ${f.pasanganNama ? `<p class="text-xs text-slate-500 mt-0.5">Pasangan: ${f.pasanganNama} (${formatIC(f.pasanganKP)})</p>` : ''}
                                 </div>
+                                ${f.isPaid ? `
+                                    <span class="bg-emerald-600 text-white text-[10px] sm:text-[11px] font-bold px-2.5 py-1 rounded-xl shadow-sm flex items-center gap-1 shrink-0 self-start">
+                                        <i class="ph-bold ph-check-circle"></i> Selesai PIBG
+                                    </span>
+                                ` : ''}
                             </div>
 
                             ${f.crossMatchNote ? `
@@ -468,22 +768,25 @@
                             ` : ''}
 
                             <div class="space-y-1.5 pt-1">
-                                <p class="text-[11px] font-bold uppercase text-slate-400">Senarai Anak Di Sekolah (${f.jumlahAnak} Orang):</p>
+                                <p class="text-[11px] font-bold uppercase text-slate-400">Senarai Anak (${f.jumlahAnak} Beradik):</p>
                                 ${anakRows}
                             </div>
                         </div>
 
                         <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 no-print">
-                            <button onclick="togglePibgPaid('${f.utamaKP}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${pibgBtnClass}">
-                                <i class="ph-bold ${f.isPaid ? 'ph-check-circle' : 'ph-wallet'}"></i>
-                                ${f.isPaid ? 'PIBG Selesai Dibayar' : 'Tandakan Bayar PIBG'}
-                            </button>
-                            <div class="flex items-center gap-1.5">
-                                <button onclick="openWhatsAppWaris('${f.utamaKP}')" class="px-2.5 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-xl text-xs font-bold transition flex items-center gap-1">
+                            ${f.isPaid ? `
+                                <button onclick="togglePibgPaid('${f.utamaKP}')" class="px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95">
+                                    <i class="ph-bold ph-check-circle"></i> Buka Kunci PIBG
+                                </button>
+                            ` : `
+                                <span class="text-[11px] text-slate-400 italic">Pilih salah seorang anak untuk bayar PIBG</span>
+                            `}
+                            <div class="flex items-center gap-1.5 ml-auto">
+                                <button onclick="openWhatsAppWaris('${f.utamaKP}')" class="px-3 py-2 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-xl text-xs font-bold transition flex items-center gap-1 active:scale-95">
                                     <i class="ph-fill ph-whatsapp-logo text-sm"></i> WhatsApp
                                 </button>
-                                <button onclick="openSlipModal('${f.utamaKP}')" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1">
-                                    <i class="ph-bold ph-printer"></i> Slip Bukti
+                                <button onclick="openSlipModal('${f.utamaKP}')" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1 active:scale-95">
+                                    <i class="ph-bold ph-printer"></i> Slip
                                 </button>
                             </div>
                         </div>
@@ -494,56 +797,28 @@
 
         function renderStudentTable() {
             const tbody = document.getElementById('student-table-body');
-            if (!tbody) return;
-            const searchEl = document.getElementById('student-table-search');
-            const q = (searchEl ? searchEl.value : '').trim().toLowerCase();
-
-            const list = students.filter(s => {
-                if (!q) return true;
-                return s.nama.toLowerCase().includes(q) ||
-                    s.kelas.toLowerCase().includes(q) ||
-                    s.namaBapa.toLowerCase().includes(q) ||
-                    cleanIC(s.kpBapa).includes(q);
-            });
-
-            tbody.innerHTML = list.map((s, idx) => {
-                const mapInfo = studentFamilyMap[s.id];
-                const fam = mapInfo ? mapInfo.family : null;
-                const isRep = mapInfo ? mapInfo.isRepresentative : true;
-                const bil = fam ? fam.jumlahAnak : 1;
-
+            tbody.innerHTML = students.map((s, idx) => {
+                const famInfo = studentFamilyMap[s.id];
+                const isPaid = famInfo && (paidStudentsMap[s.id] || (famInfo.family.paidStudentId === s.id));
                 return `
-                    <tr class="hover:bg-slate-50">
-                        <td class="py-3 px-4 font-medium text-slate-500">${idx + 1}</td>
-                        <td class="py-3 px-4">
-                            <p class="font-bold text-slate-800">${s.nama}</p>
-                            <p class="text-xs text-slate-500 font-mono">${formatIC(s.mykid)}</p>
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-4 font-bold text-slate-400">${idx + 1}</td>
+                        <td class="p-4">
+                            <p class="font-bold text-slate-900">${s.nama}</p>
+                            <p class="text-xs font-mono text-slate-500">MyKid: ${formatIC(s.mykid)}</p>
                         </td>
-                        <td class="py-3 px-4 font-semibold text-indigo-700">${s.kelas}</td>
-                        <td class="py-3 px-4">
-                            <p class="font-medium text-slate-800">${s.namaBapa || '-'}</p>
-                            <p class="text-xs text-slate-500 font-mono">${formatIC(s.kpBapa)}</p>
-                        </td>
-                        <td class="py-3 px-4">
-                            <p class="font-medium text-slate-800">${s.namaIbu || '-'}</p>
-                            <p class="text-xs text-slate-500 font-mono">${formatIC(s.kpIbu)}</p>
-                        </td>
-                        <td class="py-3 px-4 text-center">
-                            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${bil > 1 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}">
-                                ${bil > 1 ? `${bil} Beradik` : '1 Anak'}
+                        <td class="p-4 font-semibold text-indigo-600">${s.kelas}</td>
+                        <td class="p-4 font-medium text-slate-800">${s.namaBapa || s.namaIbu || '-'}</td>
+                        <td class="p-4 font-mono text-slate-600">${formatIC(s.kpBapa || s.kpIbu)}</td>
+                        <td class="p-4 text-slate-600">${s.telefon || '-'}</td>
+                        <td class="p-4 text-center">
+                            <span class="inline-block px-2.5 py-1 rounded-full text-[10px] font-extrabold ${isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                ${isPaid ? 'TELAH BAYAR PIBG' : 'BELUM BAYAR'}
                             </span>
                         </td>
-                        <td class="py-3 px-4 text-center">
-                            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${isRep ? 'bg-indigo-100 text-indigo-800' : 'bg-amber-50 text-amber-800'}">
-                                ${isRep ? 'WAKIL KELUARGA' : 'DIKECUALIKAN'}
-                            </span>
-                        </td>
-                        <td class="py-3 px-4 text-right space-x-1">
-                            <button onclick="editStudent('${s.id}')" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg" title="Edit">
-                                <i class="ph-bold ph-pencil-simple"></i>
-                            </button>
-                            <button onclick="deleteStudent('${s.id}')" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg" title="Padam">
-                                <i class="ph-bold ph-trash"></i>
+                        <td class="p-4 text-center no-print">
+                            <button onclick="toggleStudentPibg('${s.id}', '${famInfo ? famInfo.family.utamaKP : ''}')" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold transition active:scale-95" title="Tukar Status Bayar">
+                                <i class="ph-bold ${isPaid ? 'ph-check-square' : 'ph-square'}"></i> Status
                             </button>
                         </td>
                     </tr>
@@ -551,671 +826,276 @@
             }).join('');
         }
 
-        function clearSearch() {
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) searchInput.value = '';
-            renderDashboard();
+        function toggleStudentPibg(studentId, utamaKP) {
+            const fam = groupedFamilies.find(f => f.utamaKP === utamaKP);
+            if (!fam || fam.isPaid) return;
+
+            fam.anak.forEach(a => { delete paidStudentsMap[a.id]; });
+            delete paidFamiliesMap[utamaKP];
+
+            paidStudentsMap[studentId] = true;
+            paidFamiliesMap[utamaKP] = true;
+            showToast('Bayaran PIBG direkodkan. Adik-beradik lain dikecualikan automatik dan keluarga dikunci.');
+
+            saveToStorage();
+            processFamilies();
         }
 
         function togglePibgPaid(utamaKP) {
-            paidFamiliesMap[utamaKP] = !paidFamiliesMap[utamaKP];
-            saveToStorage();
-            processFamilies();
-            showToast(paidFamiliesMap[utamaKP] ? 'Ditandakan selesai bayar PIBG!' : 'Status bayaran PIBG dikemaskini.');
-        }
-
-        function openWhatsAppWaris(utamaKP) {
             const fam = groupedFamilies.find(f => f.utamaKP === utamaKP);
             if (!fam) return;
-            let phone = cleanIC(fam.telefon);
-            if (phone.startsWith('0')) phone = '6' + phone;
-            const senaraiAnak = fam.anak.map((a, i) => `${i + 1}. ${a.nama} (${a.kelas})`).join('%0A');
-            const statusPibg = fam.isPaid ? 'SELESAI DIBAYAR' : 'BELUM DIBAYAR (1 Wakil Keluarga Sahaja)';
-            const text = `Salam Sejahtera Tuan/Puan *${fam.utamaNama}*,%0A%0AMakluman Semakan Rekod Anak Di Sekolah:%0A${senaraiAnak}%0A%0AJumlah Anak: *${fam.jumlahAnak} Orang*%0AStatus Sumbangan PIBG: *${statusPibg}*%0A%0ATerima kasih.`;
-            window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+
+            if (fam.isPaid) {
+                fam.anak.forEach(a => { delete paidStudentsMap[a.id]; });
+                delete paidFamiliesMap[utamaKP];
+                showToast('Kunci bayaran PIBG dibuka semula.');
+            } else {
+                if (fam.anak.length > 0) {
+                    paidStudentsMap[fam.anak[0].id] = true;
+                }
+                paidFamiliesMap[utamaKP] = true;
+                showToast('Keluarga ditandakan selesai membayar PIBG.');
+            }
+
+            saveToStorage();
+            processFamilies();
         }
 
         function openSlipModal(utamaKP) {
             const fam = groupedFamilies.find(f => f.utamaKP === utamaKP);
             if (!fam) return;
-            const rows = fam.anak.map((a, i) => `
-                <tr class="border-b border-slate-200">
-                    <td class="py-2 px-3">${i + 1}</td>
-                    <td class="py-2 px-3 font-bold">${a.nama}</td>
-                    <td class="py-2 px-3">${a.kelas}</td>
-                    <td class="py-2 px-3 font-semibold">${i === 0 ? 'WAKIL BAYARAN PIBG' : 'DIKECUALIKAN (ADIK-BERADIK)'}</td>
-                </tr>
-            `).join('');
 
-            const slipContent = document.getElementById('slip-content');
-            if (slipContent) {
-                slipContent.innerHTML = `
-                    <div class="border-2 border-slate-800 p-5 rounded-xl space-y-4">
-                        <div class="text-center border-b border-slate-200 pb-3">
-                            <h4 class="font-extrabold text-base uppercase">SLIP PENGESAHAN ADIK-BERADIK & WAKIL KELUARGA</h4>
-                            <p class="text-xs text-slate-500">Cetakan Sistem e-Waris Pintar Sekolah</p>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2 text-xs">
-                            <div><span class="text-slate-500">Nama Waris:</span> <strong class="block text-slate-900">${fam.utamaNama}</strong></div>
-                            <div><span class="text-slate-500">No. KP Waris:</span> <strong class="block text-slate-900">${formatIC(fam.utamaKP)}</strong></div>
-                            <div><span class="text-slate-500">Bilangan Anak:</span> <strong class="block text-emerald-700">${fam.jumlahAnak} Orang Di Sekolah</strong></div>
-                            <div><span class="text-slate-500">Status PIBG:</span> <strong class="block">${fam.isPaid ? 'SELESAI BAYAR' : 'BELUM BAYAR'}</strong></div>
-                        </div>
-                        <table class="w-full text-left text-xs border border-slate-200">
-                            <thead class="bg-slate-100">
-                                <tr>
-                                    <th class="py-2 px-3">Bil</th>
-                                    <th class="py-2 px-3">Nama Murid</th>
-                                    <th class="py-2 px-3">Kelas</th>
-                                    <th class="py-2 px-3">Status Wakil</th>
-                                </tr>
-                            </thead>
-                            <tbody>${rows}</tbody>
-                        </table>
-                    </div>
+            const slipEl = document.getElementById('slip-content');
+            const paidText = fam.isPaid ? 'SELESAI (1 KELUARGA 1 BAYARAN)' : 'BELUM JELAS';
+            const paidBadgeColor = fam.isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
+
+            const anakListHtml = fam.anak.map((a, idx) => {
+                const isThisPaid = paidStudentsMap[a.id] || (fam.paidStudentId === a.id);
+                return `
+                    <tr class="border-b border-slate-100">
+                        <td class="p-2 font-bold">${idx + 1}</td>
+                        <td class="p-2">${a.nama}</td>
+                        <td class="p-2 font-mono">${formatIC(a.mykid)}</td>
+                        <td class="p-2">${a.kelas}</td>
+                        <td class="p-2 font-semibold text-center ${isThisPaid ? 'text-emerald-700' : 'text-slate-500'}">
+                            ${isThisPaid ? 'WAKIL BAYARAN PIBG' : 'DIKECUALIKAN (ADIK)'}
+                        </td>
+                    </tr>
                 `;
-            }
-            const slipModal = document.getElementById('slip-modal');
-            if (slipModal) slipModal.classList.remove('hidden');
+            }).join('');
+
+            slipEl.innerHTML = `
+                <div class="text-center space-y-1 border-b border-slate-200 pb-4">
+                    <h2 class="text-sm sm:text-lg font-extrabold text-slate-900">SLIP PENGESAHAN WARIS & ADIK-BERADIK</h2>
+                    <p class="text-xs text-slate-500">Unit Hal Ehwal Murid & PIBG Sekolah</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs py-2">
+                    <div>
+                        <p class="text-slate-400 font-semibold">Nama Waris Utama:</p>
+                        <p class="font-bold text-slate-900 text-sm">${fam.utamaNama}</p>
+                        <p class="font-mono text-slate-600">No. KP: ${formatIC(fam.utamaKP)}</p>
+                    </div>
+                    <div>
+                        <p class="text-slate-400 font-semibold">No. Telefon:</p>
+                        <p class="font-bold text-slate-900">${fam.telefon}</p>
+                        <p class="text-slate-400 font-semibold mt-1">Status PIBG:</p>
+                        <span class="inline-block px-2 py-0.5 rounded font-extrabold text-[10px] ${paidBadgeColor}">${paidText}</span>
+                    </div>
+                </div>
+                <div class="space-y-2 pt-2 overflow-x-auto">
+                    <p class="text-xs font-bold uppercase text-slate-400">Senarai Anak Di Sekolah (${fam.jumlahAnak} Orang):</p>
+                    <table class="w-full text-left border border-slate-200 text-xs min-w-[500px]">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase">
+                                <th class="p-2">Bil</th>
+                                <th class="p-2">Nama Murid</th>
+                                <th class="p-2">No. MyKid</th>
+                                <th class="p-2">Kelas</th>
+                                <th class="p-2 text-center">Status Bayaran</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${anakListHtml}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pt-4 flex flex-col sm:flex-row justify-between gap-2 text-xs text-slate-500 border-t border-slate-200">
+                    <p>Tarikh Cetakan: ${new Date().toLocaleDateString('ms-MY')}</p>
+                    <p>Disahkan oleh Pejabat Sekolah</p>
+                </div>
+            `;
+
+            document.getElementById('slip-modal').classList.remove('hidden');
         }
 
         function closeSlipModal() {
-            const slipModal = document.getElementById('slip-modal');
-            if (slipModal) slipModal.classList.add('hidden');
+            document.getElementById('slip-modal').classList.add('hidden');
         }
 
-        function printSlipContainer() {
-            window.print();
-        }
-
-        function openAddModal() {
-            const editId = document.getElementById('inp-edit-id');
-            const form = document.getElementById('add-student-form');
-            const title = document.getElementById('modal-student-title');
-            const modal = document.getElementById('add-modal');
-            if (editId) editId.value = '';
-            if (form) form.reset();
-            if (title) title.innerHTML = '<i class="ph-fill ph-user-plus text-amber-400 text-xl"></i> Tambah Rekod Murid & Waris';
-            if (modal) modal.classList.remove('hidden');
-        }
-
-        function closeAddModal() {
-            const modal = document.getElementById('add-modal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        function openPasteModal() {
-            const modal = document.getElementById('paste-modal');
-            if (modal) modal.classList.remove('hidden');
-        }
-
-        function closePasteModal() {
-            const modal = document.getElementById('paste-modal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        function openUploadModal() {
-            const modal = document.getElementById('upload-modal');
-            if (modal) modal.classList.remove('hidden');
-        }
-
-        function closeUploadModal() {
-            const modal = document.getElementById('upload-modal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        function handleAddStudent(e) {
-            e.preventDefault();
-            const editId = document.getElementById('inp-edit-id').value;
-            const record = {
-                id: editId || ('M_' + Date.now()),
-                nama: document.getElementById('inp-nama').value.trim().toUpperCase(),
-                mykid: cleanIC(document.getElementById('inp-mykid').value),
-                kelas: document.getElementById('inp-kelas').value.trim().toUpperCase(),
-                namaBapa: document.getElementById('inp-bapa-nama').value.trim().toUpperCase(),
-                kpBapa: cleanIC(document.getElementById('inp-bapa-kp').value),
-                namaIbu: document.getElementById('inp-ibu-nama').value.trim().toUpperCase(),
-                kpIbu: cleanIC(document.getElementById('inp-ibu-kp').value),
-                telefon: document.getElementById('inp-tel').value.trim() || '-'
-            };
-
-            if (editId) {
-                const idx = students.findIndex(s => s.id === editId);
-                if (idx !== -1) students[idx] = record;
-                showToast('Rekod murid berjaya dikemaskini!');
+        function printOrSavePDF() {
+            const slipContent = document.getElementById('slip-content').innerHTML;
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            if (printWindow) {
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="ms">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Slip Rasmi PIBG</title>
+                        <script src="https://cdn.tailwindcss.com"><\/script>
+                        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+                        <style>body { font-family: 'Inter', sans-serif; padding: 30px; background: white; }</style>
+                    </head>
+                    <body>
+                        <div class="max-w-xl mx-auto space-y-6">${slipContent}</div>
+                        <script>
+                            window.onload = function() {
+                                setTimeout(() => { window.print(); window.close(); }, 300);
+                            };
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
             } else {
-                students.unshift(record);
-                showToast('Rekod murid baharu berjaya ditambah!');
+                window.print();
             }
-
-            saveToStorage();
-            processFamilies();
-            closeAddModal();
         }
 
-        function editStudent(id) {
-            const s = students.find(item => item.id === id);
-            if (!s) return;
-            document.getElementById('inp-edit-id').value = s.id;
-            document.getElementById('inp-nama').value = s.nama;
-            document.getElementById('inp-mykid').value = s.mykid;
-            document.getElementById('inp-kelas').value = s.kelas;
-            document.getElementById('inp-bapa-nama').value = s.namaBapa;
-            document.getElementById('inp-bapa-kp').value = s.kpBapa;
-            document.getElementById('inp-ibu-nama').value = s.namaIbu;
-            document.getElementById('inp-ibu-kp').value = s.kpIbu;
-            document.getElementById('inp-tel').value = s.telefon;
-            document.getElementById('modal-student-title').innerHTML = '<i class="ph-fill ph-pencil-simple text-amber-400 text-xl"></i> Kemaskini Rekod Murid';
-            document.getElementById('add-modal').classList.remove('hidden');
-        }
+        function openWhatsAppWaris(utamaKP) {
+            const fam = groupedFamilies.find(f => f.utamaKP === utamaKP);
+            if (!fam) return;
 
-        function deleteStudent(id) {
-            students = students.filter(s => s.id !== id);
-            saveToStorage();
-            processFamilies();
-            showToast('Rekod murid telah dipadam.');
-        }
-
-        function clearAllData() {
-            students = [];
-            saveToStorage();
-            processFamilies();
-            showToast('Semua data murid telah dikosongkan.');
-        }
-
-        function fillSamplePaste() {
-            const sample = [
-                'MUHAMMAD HARITH BIN ZAINAL\t140211025112\t6 BESTARI\tZAINAL BIN ABIDIN\t810303025441\tSURAYA BINTI DAUD\t830505026118\t012-4455667',
-                'NUR HANA HUMAIRA BINTI ZAINAL\t170819026224\t3 CEMERLANG\tZAINAL BIN ABIDIN\t810303025441\tSURAYA BINTI DAUD\t830505026118\t012-4455667'
-            ].join('\n');
-            const ta = document.getElementById('paste-textarea');
-            if (ta) ta.value = sample;
-        }
-
-        function processPastedData() {
-            const ta = document.getElementById('paste-textarea');
-            if (!ta) return;
-            const raw = ta.value.trim();
-            if (!raw) {
-                showToast('Sila tampal baris data daripada Excel terlebih dahulu.');
-                return;
-            }
-            const replaceAllEl = document.getElementById('paste-replace-all');
-            const replaceAll = replaceAllEl ? replaceAllEl.checked : false;
-            const lines = raw.split(/\r\n|\n/).filter(l => l.trim() !== '');
-            const added = [];
-
-            lines.forEach((line, idx) => {
-                const cols = line.includes('\t') ? line.split('\t').map(c => c.trim()) : parseCSVRow(line);
-                if (idx === 0 && (cols[0].toLowerCase().includes('nama') || (cols[1] && cols[1].toLowerCase().includes('mykid')))) {
-                    return;
-                }
-                if (cols.length >= 4 && cols[0]) {
-                    added.push({
-                        id: 'PST_' + Date.now() + '_' + idx,
-                        nama: cols[0].toUpperCase(),
-                        mykid: cleanIC(cols[1] || ''),
-                        kelas: (cols[2] || 'TIADA KELAS').toUpperCase(),
-                        namaBapa: (cols[3] || '').toUpperCase(),
-                        kpBapa: cleanIC(cols[4] || ''),
-                        namaIbu: (cols[5] || '').toUpperCase(),
-                        kpIbu: cleanIC(cols[6] || ''),
-                        telefon: cols[7] || '-'
-                    });
-                }
-            });
-
-            if (added.length === 0) {
-                showToast('Tiada baris sah dapat diproses. Semak susunan lajur.');
-                return;
-            }
-
-            if (replaceAll) {
-                students = added;
-            } else {
-                students = [...added, ...students];
-            }
-
-            saveToStorage();
-            processFamilies();
-            closePasteModal();
-            ta.value = '';
-            showToast(`Berjaya memasukkan ${added.length} rekod murid!`);
-        }
-
-        function handleCSVFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const text = e.target.result;
-                const lines = text.split(/\r\n|\n/).filter(l => l.trim() !== '');
-                const imported = [];
-                lines.forEach((line, idx) => {
-                    const cols = parseCSVRow(line);
-                    if (idx === 0 && cols[0].toLowerCase().includes('nama')) return;
-                    if (cols.length >= 4 && cols[0]) {
-                        imported.push({
-                            id: 'CSV_' + Date.now() + '_' + idx,
-                            nama: cols[0].toUpperCase(),
-                            mykid: cleanIC(cols[1] || ''),
-                            kelas: (cols[2] || 'TIADA KELAS').toUpperCase(),
-                            namaBapa: (cols[3] || '').toUpperCase(),
-                            kpBapa: cleanIC(cols[4] || ''),
-                            namaIbu: (cols[5] || '').toUpperCase(),
-                            kpIbu: cleanIC(cols[6] || ''),
-                            telefon: cols[7] || '-'
-                        });
-                    }
-                });
-                if (imported.length > 0) {
-                    students = imported;
-                    saveToStorage();
-                    processFamilies();
-                    closeUploadModal();
-                    showToast(`Berjaya import ${imported.length} rekod murid daripada CSV!`);
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function downloadTemplateCSV() {
-            const header = 'Nama Murid,MyKid,Kelas,Nama Bapa,No KP Bapa,Nama Ibu,No KP Ibu,No Telefon\n';
-            const sample = 'MUHAMMAD DANISH BIN AHMAD,140312025119,6 BESTARI,AHMAD BIN HASSAN,820512025431,NORAINI BINTI KAMARUDIN,840819026122,012-4518890\n' +
-                           'NUR DAMIA BINTI AHMAD,160722026314,4 CEMERLANG,AHMAD BIN HASSAN,820512025431,NORAINI BINTI KAMARUDIN,840819026122,012-4518890\n';
-            const blob = new Blob([header + sample], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'Templat_eWaris_Sekolah.csv';
-            a.click();
-        }
-
-        function exportFamilyCSV() {
-            let csv = 'No KP Waris,Nama Waris,No Telefon,Bilangan Anak,Status Keluarga,Status PIBG,Senarai Anak & Kelas\n';
-            groupedFamilies.forEach(f => {
-                const senarai = f.anak.map(a => `${a.nama} (${a.kelas})`).join(' | ');
-                const status = f.lebihSatu ? `LEBIH 1 ANAK (${f.jumlahAnak})` : '1 ANAK';
-                const pibg = f.isPaid ? 'SELESAI BAYAR' : 'BELUM BAYAR';
-                csv += `" '${f.utamaKP}","${f.utamaNama}","${f.telefon}",${f.jumlahAnak},"${status}","${pibg}","${senarai}"\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'Laporan_Keluarga_eWaris.csv';
-            a.click();
-        }
-
-        function copyCode(elementId) {
-            const el = document.getElementById(elementId);
-            if (!el) return;
-            const text = el.innerText;
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            showToast('Kod / Formula berjaya disalin!');
+            const anakListStr = fam.anak.map((a, i) => `${i+1}. ${a.nama} (${a.kelas})`).join('%0A');
+            const statusStr = fam.isPaid ? 'SELESAI (Telah dijelaskan)' : 'BELUM JELAS (Sila selesaikannya melalui wakil anak)';
+            const msg = `Assalamualaikum / Selamat Sejahtera En/Pn ${fam.utamaNama},%0A%0AKami dari pihak sekolah ingin memaklumkan senarai anak jagaan tuan/puan di sekolah:%0A${anakListStr}%0A%0AStatus Bayaran PIBG Keluarga: *${statusStr}*.%0ATerima kasih atas kerjasama tuan/puan.`;
+            
+            let phone = fam.telefon.replace(/[^0-9]/g, '');
+            if (phone.startsWith('0')) phone = '6' + phone;
+            
+            window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
         }
 
         function openSheetSyncModal() {
-            const urlInp = document.getElementById('inp-sheet-url');
-            const intervalInp = document.getElementById('inp-sync-interval');
-            const btnDisconnect = document.getElementById('btn-disconnect-sheet');
-
-            if (urlInp) urlInp.value = googleSheetConfig.url || '';
-            if (intervalInp) intervalInp.value = googleSheetConfig.intervalSec || 60;
-            if (btnDisconnect) {
-                if (googleSheetConfig.url) btnDisconnect.classList.remove('hidden');
-                else btnDisconnect.classList.add('hidden');
-            }
-            const modal = document.getElementById('sheet-sync-modal');
-            if (modal) modal.classList.remove('hidden');
+            document.getElementById('sync-url-input').value = '';
+            document.getElementById('sync-modal').classList.remove('hidden');
         }
 
         function closeSheetSyncModal() {
-            const modal = document.getElementById('sheet-sync-modal');
-            if (modal) modal.classList.add('hidden');
+            document.getElementById('sync-modal').classList.add('hidden');
         }
 
         function saveAndConnectGoogleSheet() {
-            const urlInp = document.getElementById('inp-sheet-url');
-            const intervalInp = document.getElementById('inp-sync-interval');
-            if (!urlInp) return;
-            let rawUrl = urlInp.value.trim();
-            const intervalSec = intervalInp ? parseInt(intervalInp.value) || 60 : 60;
-
-            if (!rawUrl) {
-                showToast('Sila masukkan pautan URL Google Sheets.');
+            const url = document.getElementById('sync-url-input').value.trim();
+            if (!url) {
+                showToast('Sila masukkan pautan Google Sheets yang sah.');
                 return;
             }
-
-            // Sanitasi pautan URL Google Sheets supaya sentiasa merujuk kepada eksport CSV yang sah
-            let csvUrl = rawUrl;
-            if (rawUrl.includes('/edit')) {
-                csvUrl = rawUrl.split('/edit')[0] + '/export?format=csv';
-            } else if (rawUrl.includes('/pubhtml')) {
-                csvUrl = rawUrl.replace('/pubhtml', '/pub?output=csv');
-            } else if (!rawUrl.includes('output=csv') && !rawUrl.includes('format=csv')) {
-                if (rawUrl.includes('?')) {
-                    csvUrl = rawUrl + '&output=csv';
-                } else {
-                    csvUrl = rawUrl + '/export?format=csv';
-                }
-            }
-
-            googleSheetConfig = {
-                url: csvUrl,
-                originalUrl: rawUrl,
-                intervalSec: intervalSec,
-                lastSync: 'Baru sahaja'
-            };
-
-            localStorage.setItem('ewaris_gsheet_config', JSON.stringify(googleSheetConfig));
             closeSheetSyncModal();
-            updateSyncUI();
-            setupAutoSyncTimer();
-            syncFromGoogleSheet(true);
-        }
-
-        function disconnectGoogleSheet() {
-            googleSheetConfig = { url: '', originalUrl: '', intervalSec: 60, lastSync: null };
-            localStorage.removeItem('ewaris_gsheet_config');
-            if (syncTimerId) clearInterval(syncTimerId);
-            closeSheetSyncModal();
-            updateSyncUI();
-            showToast('Sambungan Google Sheets diputuskan.');
-        }
-
-        function setupAutoSyncTimer() {
-            if (syncTimerId) clearInterval(syncTimerId);
-            if (googleSheetConfig.url && googleSheetConfig.intervalSec > 0) {
-                syncTimerId = setInterval(() => {
-                    syncFromGoogleSheet(false);
-                }, googleSheetConfig.intervalSec * 1000);
-            }
-        }
-
-        function syncFromGoogleSheet(showAlert = true) {
-            if (!googleSheetConfig.url) {
-                if (showAlert) showToast('Tiada pautan Google Sheets disambungkan.');
-                return;
+            showToast('Menghubungkan ke Google Sheets...');
+            
+            let fetchUrl = url;
+            if (url.includes('/edit')) {
+                fetchUrl = url.replace(/\/edit.*$/, '/export?format=csv');
             }
 
-            if (showAlert) showToast('Sedang menarik data terkini dari Google Sheets...');
-
-            // Cuba fetch menggunakan pautan CSV terus, jika gagal gunakan CORS proxy alternatif
-            fetch(googleSheetConfig.url)
-                .then(response => {
-                    if (!response.ok) throw new Error('Gagal mengakses pautan Google Sheets (Pastikan akses "Anyone with the link" diaktifkan).');
-                    return response.text();
-                })
-                .then(text => {
-                    // Jika Google Sheet memulangkan halaman HTML ralat log masuk / kebenaran
-                    if (text.trim().toLowerCase().startsWith('<!doctype html') || text.includes('accounts.google.com')) {
-                        throw new Error('Google Sheets menyekat akses. Sila pastikan anda sudah tekan "Publish to web" (Format CSV) atau tukar Share kepada "Anyone with the link (Viewer)".');
-                    }
-
-                    const lines = text.split(/\r\n|\n/).filter(l => l.trim() !== '');
-                    const imported = [];
-                    lines.forEach((line, idx) => {
-                        const cols = parseCSVRow(line);
-                        if (idx === 0 && (cols[0].toLowerCase().includes('nama') || (cols[1] && cols[1].toLowerCase().includes('mykid')))) {
-                            return;
-                        }
-                        if (cols.length >= 4 && cols[0]) {
-                            imported.push({
-                                id: 'GS_' + idx + '_' + Date.now(),
-                                nama: cols[0].toUpperCase(),
-                                mykid: cleanIC(cols[1] || ''),
-                                kelas: (cols[2] || 'TIADA KELAS').toUpperCase(),
-                                namaBapa: (cols[3] || '').toUpperCase(),
-                                kpBapa: cleanIC(cols[4] || ''),
-                                namaIbu: (cols[5] || '').toUpperCase(),
-                                kpIbu: cleanIC(cols[6] || ''),
-                                telefon: cols[7] || '-'
-                            });
-                        }
-                    });
-
-                    if (imported.length > 0) {
-                        students = imported;
-                        saveToStorage();
-                        processFamilies();
-                        const now = new Date();
-                        googleSheetConfig.lastSync = now.toLocaleTimeString();
-                        localStorage.setItem('ewaris_gsheet_config', JSON.stringify(googleSheetConfig));
-                        updateSyncUI();
-                        if (showAlert) showToast(`Berjaya sinkronisasi ${imported.length} rekod murid dari Google Sheets!`);
-                    } else {
-                        if (showAlert) showToast('Amaran: Tiada data sah dijumpai. Pastikan susunan lajur bermula dari Lajur A.');
-                    }
+            fetch(fetchUrl)
+                .then(res => res.text())
+                .then(csvText => {
+                    parseAndLoadCSV(csvText);
+                    showToast('Berjaya segerak data dari Google Sheets!');
                 })
                 .catch(err => {
-                    console.error(err);
-                    // Cuba kaedah fallback menggunakan CORS proxy jika fetch terus disekat browser
-                    if (showAlert) {
-                        showToast('Mencuba sambungan alternatif...');
-                    }
-                    fallbackFetchGoogleSheet(googleSheetConfig.originalUrl || googleSheetConfig.url, showAlert);
+                    showToast('Gagal menyambung ke Google Sheets. Pastikan akses pautan adalah "Anyone with the link".');
                 });
         }
 
-        function fallbackFetchGoogleSheet(url, showAlert) {
-            // Gunakan AllOrigins CORS proxy sebagai sandaran jika Google Sheets menyekat permintaan terus
-            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url.includes('export?format=csv') ? url : url + '/export?format=csv')}`;
-            
-            fetch(proxyUrl)
-                .then(res => res.json())
-                .then(data => {
-                    if (!data || !data.contents) throw new Error('Gagal membaca kandungan dari proxy.');
-                    const text = data.contents;
-                    const lines = text.split(/\r\n|\n/).filter(l => l.trim() !== '');
-                    const imported = [];
-                    lines.forEach((line, idx) => {
-                        const cols = parseCSVRow(line);
-                        if (idx === 0 && (cols[0].toLowerCase().includes('nama') || (cols[1] && cols[1].toLowerCase().includes('mykid')))) {
-                            return;
-                        }
-                        if (cols.length >= 4 && cols[0]) {
-                            imported.push({
-                                id: 'GS_PRX_' + idx + '_' + Date.now(),
-                                nama: cols[0].toUpperCase(),
-                                mykid: cleanIC(cols[1] || ''),
-                                kelas: (cols[2] || 'TIADA KELAS').toUpperCase(),
-                                namaBapa: (cols[3] || '').toUpperCase(),
-                                kpBapa: cleanIC(cols[4] || ''),
-                                namaIbu: (cols[5] || '').toUpperCase(),
-                                kpIbu: cleanIC(cols[6] || ''),
-                                telefon: cols[7] || '-'
-                            });
-                        }
+        function parseAndLoadCSV(csvText) {
+            const lines = csvText.split('\n');
+            const newStudents = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                const cols = line.split(',').map(c => c.replace(/^["']|["']$/g, '').trim());
+                if (cols.length >= 5) {
+                    newStudents.push({
+                        id: 'IMP_' + i,
+                        nama: cols[0] || 'Tanpa Nama',
+                        mykid: cols[1] || '',
+                        kelas: cols[2] || '1 Arif',
+                        namaBapa: cols[3] || 'Waris Utama',
+                        kpBapa: cols[4] || '',
+                        namaIbu: cols[5] || '',
+                        kpIbu: cols[6] || '',
+                        telefon: cols[7] || '-'
                     });
-
-                    if (imported.length > 0) {
-                        students = imported;
-                        saveToStorage();
-                        processFamilies();
-                        const now = new Date();
-                        googleSheetConfig.lastSync = now.toLocaleTimeString();
-                        localStorage.setItem('ewaris_gsheet_config', JSON.stringify(googleSheetConfig));
-                        updateSyncUI();
-                        if (showAlert) showToast(`Berjaya sinkronisasi ${imported.length} rekod melalui pelayan sandaran!`);
-                    } else {
-                        if (showAlert) showToast('Ralat: Fail Google Sheets kosong atau format tidak sah.');
-                    }
-                })
-                .catch(err2 => {
-                    console.error(err2);
-                    if (showAlert) showToast('Ralat sambungan Google Sheets. Sila pastikan fail telah di-Publish ke web.');
-                });
-        }
-
-        function parseCSVRow(text) {
-            const result = [];
-            let insideQuote = false;
-            let entry = '';
-            for (let i = 0; i < text.length; i++) {
-                const c = text[i];
-                if (c === '"') {
-                    insideQuote = !insideQuote;
-                } else if (c === ',' && !insideQuote) {
-                    result.push(entry.trim().replace(/^"|"$/g, ''));
-                    entry = '';
-                } else {
-                    entry += c;
                 }
             }
-            result.push(entry.trim().replace(/^"|"$/g, ''));
-            return result;
-        }
 
-        function updateSyncUI() {
-            const banner = document.getElementById('live-sync-banner');
-            const label = document.getElementById('sync-status-label');
-            const timestampEl = document.getElementById('live-sync-timestamp');
-
-            if (googleSheetConfig.url) {
-                if (banner) banner.classList.remove('hidden');
-                if (label) label.textContent = 'Google Sheets: Aktif';
-                const timeStr = googleSheetConfig.lastSync || 'Sedang menyemak...';
-                const intervalText = googleSheetConfig.intervalSec > 0 ? `Auto-semak setiap ${googleSheetConfig.intervalSec} saat` : 'Mod Manual';
-                if (timestampEl) timestampEl.textContent = `Kemaskini terakhir: ${timeStr} • ${intervalText}`;
+            if (newStudents.length > 0) {
+                students = newStudents;
+                saveToStorage();
+                processFamilies();
             } else {
-                if (banner) banner.classList.add('hidden');
-                if (label) label.textContent = 'Sambung Google Sheets (Live)';
+                showToast('Tiada rekod sah dijumpai dalam fail CSV.');
             }
         }
 
-        // Initialize application on window load
-        window.onload = async function() {
-            await initFirebaseAndSync();
-        };
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            renderDashboard();
+        }
 
-        // ==========================================
-        // FIREBASE CLOUD SYNC & AUTHENTICATION
-        // ==========================================
-        let db, auth, currentUser = null;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'sekolah-ewaris-default-app';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => { toast.classList.add('hidden'); }, 3000);
+        }
 
-        async function initFirebaseAndSync() {
-            const statusText = document.getElementById('cloud-status-text');
-            const statusDot = document.getElementById('cloud-status-dot');
-
-            if (!firebaseConfig || !window.firebaseModules) {
-                // Fallback to localStorage if Firebase is not provided
-                if (statusText) statusText.textContent = 'Mod Storan Tempatan (Local Storage)';
-                if (statusDot) statusDot.className = 'inline-block w-2.5 h-2.5 rounded-full bg-blue-400';
-                loadFromLocalFallback();
-                return;
-            }
-
+        function saveToStorage() {
+            if (isRemoteUpdate) return;
             try {
-                const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, getFirestore, collection, doc, onSnapshot } = window.firebaseModules;
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
+                localStorage.setItem('ewaris_students_data', JSON.stringify(students));
+                localStorage.setItem('ewaris_paid_families', JSON.stringify(paidFamiliesMap));
+                localStorage.setItem('ewaris_paid_students', JSON.stringify(paidStudentsMap));
 
-                // Authentication
-                const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : undefined;
-                if (initialToken) {
-                    await signInWithCustomToken(auth, initialToken);
-                } else {
-                    await signInAnonymously(auth);
+                if (window.isCloudSynced && window.firebaseDb && window.firebaseDocRef) {
+                    setDoc(window.firebaseDocRef, {
+                        students: students,
+                        paidFamiliesMap: paidFamiliesMap,
+                        paidStudentsMap: paidStudentsMap,
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true }).catch(err => {
+                        console.warn('Cloud sync save notice:', err);
+                    });
                 }
-
-                currentUser = auth.currentUser;
-
-                // Real-time listener for public cloud data (Using even-segment path collection/doc/collection/doc)
-                const dataDocRef = doc(db, 'artifacts', appId, 'public_data', 'school_records');
-                
-                onSnapshot(dataDocRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        const cloudData = docSnap.data();
-                        if (cloudData.students && Array.isArray(cloudData.students)) {
-                            students = cloudData.students;
-                        }
-                        if (cloudData.paidFamiliesMap) {
-                            paidFamiliesMap = cloudData.paidFamiliesMap;
-                        }
-                        processFamilies();
-                        if (statusText) statusText.textContent = 'Cloud Sync Aktif (Multi-Peranti)';
-                        if (statusDot) statusDot.className = 'inline-block w-2.5 h-2.5 rounded-full bg-emerald-400';
-                    } else {
-                        // Initialize cloud with sample data if empty
-                        loadSampleData(false);
-                        saveToCloud();
-                    }
-                }, (error) => {
-                    // Handle permission errors silently by using robust local storage fallback
-                    if (statusText) statusText.textContent = 'Mod Storan Tempatan (Sedia Digunakan)';
-                    if (statusDot) statusDot.className = 'inline-block w-2.5 h-2.5 rounded-full bg-blue-400';
-                    loadFromLocalFallback();
-                });
-
-            } catch (err) {
-                if (statusText) statusText.textContent = 'Mod Storan Tempatan (Sedia Digunakan)';
-                if (statusDot) statusDot.className = 'inline-block w-2.5 h-2.5 rounded-full bg-blue-400';
-                loadFromLocalFallback();
-            }
+            } catch (e) {}
         }
 
         function loadFromLocalFallback() {
             try {
                 const savedStudents = localStorage.getItem('ewaris_students_data');
                 const savedPaid = localStorage.getItem('ewaris_paid_families');
-                const savedConfig = localStorage.getItem('ewaris_gsheet_config');
+                const savedPaidStudents = localStorage.getItem('ewaris_paid_students');
 
                 if (savedStudents) {
                     students = JSON.parse(savedStudents);
                 } else {
                     loadSampleData(false);
                 }
-
-                if (savedPaid) {
-                    paidFamiliesMap = JSON.parse(savedPaid);
-                }
-
-                if (savedConfig) {
-                    googleSheetConfig = JSON.parse(savedConfig);
-                    updateSyncUI();
-                    setupAutoSyncTimer();
-                }
+                if (savedPaid) paidFamiliesMap = JSON.parse(savedPaid);
+                if (savedPaidStudents) paidStudentsMap = JSON.parse(savedPaidStudents);
             } catch (e) {
                 loadSampleData(false);
             }
             processFamilies();
         }
 
-        async function saveToStorage() {
-            // Save locally as backup
-            try {
-                localStorage.setItem('ewaris_students_data', JSON.stringify(students));
-                localStorage.setItem('ewaris_paid_families', JSON.stringify(paidFamiliesMap));
-            } catch (e) {}
-
-            // Save to Cloud Firestore if connected
-            await saveToCloud();
-        }
-
-        async function saveToCloud() {
-            if (!db || !auth || !auth.currentUser) return;
-            try {
-                const { doc, setDoc } = window.firebaseModules;
-                const dataDocRef = doc(db, 'artifacts', appId, 'public_data', 'school_records');
-                await setDoc(dataDocRef, {
-                    students: students,
-                    paidFamiliesMap: paidFamiliesMap,
-                    updatedAt: new Date().toISOString(),
-                    updatedBy: auth.currentUser.uid
-                }, { merge: true });
-            } catch (e) {
-                // Silently handle insufficient permissions by relying on high-speed localStorage
-            }
-        }
+        window.onload = function() {
+            loadFromLocalFallback();
+        };
     </script>
 </body>
 </html>
